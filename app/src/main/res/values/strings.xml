@@ -1,0 +1,72 @@
+<resources>
+    <string name="app_name">Picture Cards</string>
+    <!--activity title-->
+    <string name="title_activity_box_list">Kategori Flash Card</string>
+    <string name="title_activity_card_list">Card Box</string>
+    <string name="title_activity_card_view">Card View</string>
+    <string name="title_activity_card_edit">Replace card</string>
+    <!--box demo data-->
+    <string name="box_demo_data_name1">Animal</string>
+    <string name="box_demo_data_name2">Number</string>
+    <string name="box_demo_data_name3">Alphabet</string>
+    <!--actionbar-->
+    <string name="actionbar_menu_add_box" translatable="false">Create a Box</string>
+    <string name="signUp" translatable="false">SignUp</string>
+    <string name="actionbar_menu_add_card">To Make</string>
+    <string name="actionbar_menu_delete">Clear</string>
+    <string name="actionbar_menu_delete_confirm">Confirm Delete</string>
+    <string name="actionbar_menu_sort_asc">Sortir A-Z</string>
+    <string name="actionbar_menu_sort_desc">Sortir Z-A</string>
+    <string name="actionbar_menu_sort_shuffle_card">Acak Kartu</string>
+    <string name="actionbar_menu_sort_shuffle_box">Mixing Box</string>
+    <string name="actionbar_menu_sort_reset">Sort initialization</string>
+    <string name="actionbar_menu_credit">Credits</string>
+    <!--box add dialog-->
+    <string name="box_edit_dialog_add_title">Menambah Kategori Flash Card</string>
+    <string name="box_edit_dialog_add_message">Masukan Nama Kategori</string>
+    <string name="box_edit_dialog_add_ok_button_text">Simpan</string>
+    <string name="box_edit_dialog_add_cancel_button_text">Keluar</string>
+    <!--box edit menu dialog-->
+    <string name="box_edit_dialog_menu_title">Mengganti Categori Flash Cards</string>
+    <string name="box_edit_dialog_menu_edit_text">Edit</string>
+    <string name="box_edit_dialog_menu_delete_text">Hapus</string>
+    <!--box edit dialog-->
+    <string name="box_edit_dialog_edit_title">Mengganti Flash Cards</string>
+    <string name="box_edit_dialog_edit_message">Masukan Nama Kategori Flash Card.</string>
+    <string name="box_edit_dialog_edit_ok_button_text">Simpan</string>
+    <!--box delete dialog-->
+    <string name="box_edit_dialog_delete_title">Hapus Kategori</string>
+    <string name="box_edit_dialog_delete_message">Apakah Anda Yakin Ingin Menghapus Kategori Ini?</string>
+    <string name="box_edit_dialog_delete_ok_button_text">Ya</string>
+    <string name="box_edit_dialog_delete_cancel_button_text">Tidak</string>
+    <!--card edit menu dialog-->
+    <string name="card_edit_dialog_menu_title">Mengganti Flash Cards</string>
+    <string name="card_edit_dialog_menu_edit_text">Edit</string>
+    <string name="card_edit_dialog_menu_delete_text">Hapus</string>
+    <!--card delete dialog-->
+    <string name="card_edit_dialog_delete_title">Hapus Kartu</string>
+    <string name="card_edit_dialog_delete_message">Apakah Anda Yakin Ingin Menghapus Kartu Ini?</string>
+    <string name="card_edit_dialog_delete_ok_button_text">Ya</string>
+    <string name="card_edit_dialog_delete_cancel_button_text">Tidak</string>
+    <!--card edit image dialog -->
+    <string name="card_edit_image_dialog_title">Tambahkan Gambar</string><!--카드 사진을 바꾸어 보자!-->
+    <string name="card_edit_image_dialog_camera_button_text">Ambil Dari Camera</string><!--사진 찍을래요-->
+    <string name="card_edit_image_dialog_gallery_button_text">Ambil Dari Galery</string><!--갤러리에서 사진 고를래요-->
+    <string name="card_edit_image_dialog_cancel_button_text">Simpan</string><!--나갈래요-->
+    <!--card edit text dialog-->
+    <string name="card_edit_text_dialog_title">Deskripsi Kartu</string><!--카드 이름 바꾸어 보자!-->
+    <string name="card_edit_text_dialog_message">Tulis Nama Kartunya</string>
+    <string name="card_edit_text_dialog_ok_button_text">Simpan</string><!--바꿀래요-->
+    <string name="card_edit_text_dialog_cancel_button_text">Keluar</string>
+    <!--card edit error-->
+    <string name="card_edit_error_message_no_image">Please Select a Photo</string>
+    <string name="card_edit_error_message_no_text">Please Input a Correct Name Card</string>
+    <!--card edit layout-->
+    <string name="card_edit_yes_button_text">Edit</string>
+    <string name="card_edit_no_button_text">Cancel</string>
+    <string name="card_edit_text_view_hint">Tulis Nama Kartunya</string>
+    <string name="hint_email">email</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="hint_password">password</string>
+</resources>

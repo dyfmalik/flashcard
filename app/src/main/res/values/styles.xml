@@ -1,0 +1,22 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/custom_color_gyoo</item>
+        <item name="colorPrimaryDark">@color/custom_color_gyoo</item>
+        <item name="colorAccent">@color/custom_color_gyoo</item>
+        <item name="android:actionBarSize">@dimen/actionbar_height</item>
+        <item name="android:textColorAlertDialogListItem">#000000</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+</resources>

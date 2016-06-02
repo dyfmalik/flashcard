@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="5dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="5dp">
+
+    <LinearLayout
+        android:layout_width="150dp"
+        android:layout_height="86dp"
+        android:layout_gravity="center">
+
+        <ImageView
+            android:id="@+id/boxListViewItemImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:src="@drawable/default_image_empty_image"
+            />
+    </LinearLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        >
+        <TextView
+            android:id="@+id/boxListViewItemText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:singleLine="true"
+            android:text="TEXT"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/boxListViewItemCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|right"
+            android:foreground="#f00"
+            android:padding="2dp"
+            android:text="99"
+            android:visibility="invisible"
+            android:textColor="#000000"
+            android:textSize="10dp" />
+    </FrameLayout>
+
+</LinearLayout>
