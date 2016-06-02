@@ -658,7 +658,7 @@ public class CardEditActivity extends AppCompatActivity {
     }
 
 
-
+    //by me
     private void showProgressDialog() {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(this);
