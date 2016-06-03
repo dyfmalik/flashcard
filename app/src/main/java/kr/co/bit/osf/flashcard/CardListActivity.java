@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +22,12 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +46,7 @@ import kr.co.bit.osf.flashcard.db.CardDTO;
 import kr.co.bit.osf.flashcard.db.FlashCardDB;
 import kr.co.bit.osf.flashcard.db.StateDTO;
 import kr.co.bit.osf.flashcard.debug.Dlog;
+import kr.co.bit.osf.flashcard.models.Post;
 
 public class CardListActivity extends AppCompatActivity {
     // db
@@ -67,10 +75,17 @@ public class CardListActivity extends AppCompatActivity {
     private String activityStateDataName = "activityStateDataName";
     private ActivityState currentState;
 
+    //by me
+    private DatabaseReference mDatabase;
+    public DatabaseReference text;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_list);
+        //by me
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        text = mDatabase.child("text");
 
         // db
         db = new FlashCardDB(this);
@@ -156,6 +171,8 @@ public class CardListActivity extends AppCompatActivity {
                                 intent.putExtra(IntentExtrasName.REQUEST_CODE, IntentRequestCode.CARD_EDIT);
                                 intent.putExtra(IntentExtrasName.SEND_DATA, sendCard);
                                 startActivityForResult(intent, IntentRequestCode.CARD_EDIT);
+                                //by me
+                                //getData();
                                 dialogInterface.dismiss();
                             }
                         }
@@ -221,6 +238,30 @@ public class CardListActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    public void getData(View v)
+    {
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
+                String post = dataSnapshot.getValue(String.class);
+                TextView textview=(TextView)findViewById(R.id.textViewData);
+                textview.setText(post);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.w("no", "loadPost:onCancelled", databaseError.toException());
+                // ...
+            }
+        };
+        text.addValueEventListener(postListener);
+
+
+
     }
 
     @Override

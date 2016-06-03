@@ -29,8 +29,10 @@ import com.google.android.gms.tasks.OnFailureListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import kr.co.bit.osf.flashcard.common.ImageUtil;
@@ -39,6 +41,7 @@ import kr.co.bit.osf.flashcard.common.IntentRequestCode;
 import kr.co.bit.osf.flashcard.db.CardDTO;
 import kr.co.bit.osf.flashcard.db.FlashCardDB;
 import kr.co.bit.osf.flashcard.debug.Dlog;
+import kr.co.bit.osf.flashcard.models.Post;
 import kr.co.bit.osf.flashcard.models.User;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -222,7 +225,7 @@ public class CardEditActivity extends AppCompatActivity {
                     if (intentRequestCode == IntentRequestCode.CARD_ADD) {
                         Dlog.i("yes button:check:ok:add" + card);
                         db.addCard(card);
-                        submitPost();
+                        //submitPost();
                     } else {
                         Dlog.i("yes button:check:ok:update" + card);
                         db.updateCard(card);
@@ -241,6 +244,7 @@ public class CardEditActivity extends AppCompatActivity {
                 finish();
             }
         });
+
 
 
 
@@ -292,7 +296,8 @@ public class CardEditActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             // Write new post
-                            //writeNewPost(userId, user.username, title, body);
+                            String body="body";
+                            writeNewPost(userId, user.username,  cardEditTextView.getText().toString(), body);
                         }
 
                         // Finish this Activity, back to the stream
@@ -307,10 +312,32 @@ public class CardEditActivity extends AppCompatActivity {
                 });
         // [END single_value_read]
     }
+
+    //by me
     public String getUid() {
         return FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
+    public void save(View v)
+    {
+        submitPost();
+        Toast.makeText(CardEditActivity.this,"berhasil", Toast.LENGTH_SHORT).show();
+    }
+    //by me
+    // [START write_fan_out]
+    private void writeNewPost(String userId, String username, String title, String body) {
+        // Create new post at /user-posts/$userid/$postid and at
+        // /posts/$postid simultaneously
+        String key = mDatabase.child("posts").push().getKey();
+        Post post = new Post(userId, username, title, body);
+        Map<String, Object> postValues = post.toMap();
 
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/posts/" + key, postValues);
+        childUpdates.put("/user-posts/" + userId + "/" + key, postValues);
+
+        mDatabase.updateChildren(childUpdates);
+    }
+    // [END write_fan_out]
 
     //by me for downloading downloadpath
     private void showMessageDialog(String title, String message) {
