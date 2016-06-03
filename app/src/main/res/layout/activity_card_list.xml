@@ -25,7 +25,7 @@
             android:stretchMode="columnWidth" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="36dp"
             android:layout_height="136dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Large Text"
@@ -37,6 +37,13 @@
             android:text="New Button"
             android:id="@+id/button"
             android:onClick="getData" />
+
+        <Button
+            android:layout_width="131dp"
+            android:layout_height="wrap_content"
+            android:text="New Button"
+            android:id="@+id/button2"
+            android:onClick="downloadFile" />
     </LinearLayout>
 
     <LinearLayout

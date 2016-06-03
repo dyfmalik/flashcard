@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,12 +24,20 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.StorageReference;
 
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StreamDownloadTask;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -78,6 +87,7 @@ public class CardListActivity extends AppCompatActivity {
     //by me
     private DatabaseReference mDatabase;
     public DatabaseReference text;
+    FirebaseStorage storage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +96,7 @@ public class CardListActivity extends AppCompatActivity {
         //by me
         mDatabase = FirebaseDatabase.getInstance().getReference();
         text = mDatabase.child("text");
+        storage=FirebaseStorage.getInstance();
 
         // db
         db = new FlashCardDB(this);
@@ -239,6 +250,30 @@ public class CardListActivity extends AppCompatActivity {
             }
         });
     }
+    //by me
+    public void downloadFile(View view)
+    {
+        StorageReference storageRef = storage.getReferenceFromUrl("gs://<your-bucket-name>");
+
+
+        StorageReference pathReference = storageRef.child("images/stars.jpg");
+        StorageReference islandRef = storageRef.child("images/island.jpg");
+
+        File localFile = File.createTempFile("images", "jpg");
+
+        islandRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                // Local temp file has been created
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+            }
+        });
+    }
+
 
     public void getData(View v)
     {
