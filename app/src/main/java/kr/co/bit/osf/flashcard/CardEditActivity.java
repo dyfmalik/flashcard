@@ -2,6 +2,8 @@ package kr.co.bit.osf.flashcard;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -12,8 +14,10 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -26,6 +30,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import kr.co.bit.osf.flashcard.common.ImageUtil;
@@ -34,8 +39,15 @@ import kr.co.bit.osf.flashcard.common.IntentRequestCode;
 import kr.co.bit.osf.flashcard.db.CardDTO;
 import kr.co.bit.osf.flashcard.db.FlashCardDB;
 import kr.co.bit.osf.flashcard.debug.Dlog;
+import kr.co.bit.osf.flashcard.models.User;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -70,8 +82,11 @@ public class CardEditActivity extends AppCompatActivity {
     private ProgressDialog mProgressDialog;
     // [START declare_ref]
     private StorageReference mStorageRef;
+    private DatabaseReference mDatabase;
     // [END declare_ref]
-
+    private BroadcastReceiver mDownloadReceiver;
+    //by me
+    TextView textLink;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +99,9 @@ public class CardEditActivity extends AppCompatActivity {
             mDownloadUrl = savedInstanceState.getParcelable(KEY_DOWNLOAD_URL);
         }
         mStorageRef = FirebaseStorage.getInstance().getReference();
+        textLink=(TextView)findViewById(R.id.textViewLink);
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         //
 
@@ -204,6 +222,7 @@ public class CardEditActivity extends AppCompatActivity {
                     if (intentRequestCode == IntentRequestCode.CARD_ADD) {
                         Dlog.i("yes button:check:ok:add" + card);
                         db.addCard(card);
+                        submitPost();
                     } else {
                         Dlog.i("yes button:check:ok:update" + card);
                         db.updateCard(card);
@@ -222,6 +241,84 @@ public class CardEditActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+
+
+        //by me
+        // Download receiver
+        mDownloadReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "downloadReceiver:onReceive:" + intent);
+                hideProgressDialog();
+
+                if (MyDownloadService.ACTION_COMPLETED.equals(intent.getAction())) {
+                    String path = intent.getStringExtra(MyDownloadService.EXTRA_DOWNLOAD_PATH);
+                    long numBytes = intent.getLongExtra(MyDownloadService.EXTRA_BYTES_DOWNLOADED, 0);
+
+                    // Alert success
+                    showMessageDialog("Success", String.format(Locale.getDefault(),
+                            "%d bytes downloaded from %s", numBytes, path));
+                }
+
+                if (MyDownloadService.ACTION_ERROR.equals(intent.getAction())) {
+                    String path = intent.getStringExtra(MyDownloadService.EXTRA_DOWNLOAD_PATH);
+
+                    // Alert failure
+                    showMessageDialog("Error", String.format(Locale.getDefault(),
+                            "Failed to download from %s", path));
+                }
+            }
+        };
+        //by me
+    }
+    //by me
+    private void submitPost() {
+        // [START single_value_read]
+        final String userId = getUid();
+        mDatabase.child("users").child(userId).addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        // Get user value
+                        User user = dataSnapshot.getValue(User.class);
+
+                        // [START_EXCLUDE]
+                        if (user == null) {
+                            // User is null, error out
+                            Log.e(TAG, "User " + userId + " is unexpectedly null");
+                            Toast.makeText(CardEditActivity.this,
+                                    "Error: could not fetch user.",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Write new post
+                            //writeNewPost(userId, user.username, title, body);
+                        }
+
+                        // Finish this Activity, back to the stream
+                        finish();
+                        // [END_EXCLUDE]
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.w(TAG, "getUser:onCancelled", databaseError.toException());
+                    }
+                });
+        // [END single_value_read]
+    }
+    public String getUid() {
+        return FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
+
+
+    //by me for downloading downloadpath
+    private void showMessageDialog(String title, String message) {
+        android.support.v7.app.AlertDialog ad = new android.support.v7.app.AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .create();
+        ad.show();
     }
 
     private void imageClicked() {
@@ -335,8 +432,11 @@ public class CardEditActivity extends AppCompatActivity {
                         // Get the public download URL
                         mDownloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
 
+
                         // [START_EXCLUDE]
                         hideProgressDialog();
+                        //by me
+                        textLink.setText(mDownloadUrl.toString());
                         //updateUI(mAuth.getCurrentUser());
                         // [END_EXCLUDE]
                     }
@@ -675,4 +775,20 @@ public class CardEditActivity extends AppCompatActivity {
         }
     }
 
+    //by me
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Register download receiver
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(mDownloadReceiver, MyDownloadService.getIntentFilter());
+    }
+    //by me
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // Unregister download receiver
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadReceiver);
+    }
 }
