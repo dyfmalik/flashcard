@@ -5,11 +5,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -38,6 +41,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StreamDownloadTask;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -253,18 +257,49 @@ public class CardListActivity extends AppCompatActivity {
     //by me
     public void downloadFile(View view)
     {
-        StorageReference storageRef = storage.getReferenceFromUrl("gs://<your-bucket-name>");
+        StorageReference storageRef = storage.getReferenceFromUrl("gs://project-2060904939372824557.appspot.com");
 
 
-        StorageReference pathReference = storageRef.child("images/stars.jpg");
-        StorageReference islandRef = storageRef.child("images/island.jpg");
+        StorageReference islandRef = storageRef.child("photos/3b9100a3-bc8b-4d0f-beec-66afb8c88d48.jpg");
 
-        File localFile = File.createTempFile("images", "jpg");
 
-        islandRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+        File localFile = null;
+        try {
+            localFile = File.createTempFile("images", "jpg");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /*islandRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                 // Local temp file has been created
+
+
+                ImageView img=(ImageView)findViewById(R.id.imageView2);
+                imageView.setImageBitmap(BitmapFactory.decodeFile(taskSnapshot.getStorage()));
+                imageView.setImageBitmap(BitmapFactory.decodeByteArray(taskSnapshot.getBytesTransferred(), 0,(int)taskSnapshot.getTotalByteCount ());
+                img.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+            }
+        });*/
+
+
+
+
+
+        final long ONE_MEGABYTE = 1024 * 1024;
+        islandRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+                //byte[] imageAsBytes = Base64.decode(bytes, Base64.DEFAULT);
+                ImageView img=(ImageView)findViewById(R.id.imageView2);
+                img.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+                // Data for "images/island.jpg" is returns, use this as needed
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
