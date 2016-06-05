@@ -270,23 +270,24 @@ public class CardListActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        /*islandRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+        islandRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                 // Local temp file has been created
 
-
+                StorageReference reference=taskSnapshot.getStorage();
+                String data=reference.toString();
                 ImageView img=(ImageView)findViewById(R.id.imageView2);
-                imageView.setImageBitmap(BitmapFactory.decodeFile(taskSnapshot.getStorage()));
-                imageView.setImageBitmap(BitmapFactory.decodeByteArray(taskSnapshot.getBytesTransferred(), 0,(int)taskSnapshot.getTotalByteCount ());
-                img.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+                img.setImageBitmap(BitmapFactory.decodeFile(data));
+                //imageView.setImageBitmap(BitmapFactory.decodeByteArray(taskSnapshot.getBytesTransferred(), 0,(int)taskSnapshot.getTotalByteCount ());
+                //img.setImageBitmap(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
             }
-        });*/
+        });
 
 
 
