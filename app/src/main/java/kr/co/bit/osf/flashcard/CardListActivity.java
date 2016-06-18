@@ -506,7 +506,7 @@ public class CardListActivity extends AppCompatActivity {
                         Dlog.i("layout.onClickFinished");
                     }
                 });
-            } else { //삭제 완료 했을 때
+            } else {
                 holder.checkBox.setVisibility(View.INVISIBLE);
                 Dlog.i("delete completed");
             }
