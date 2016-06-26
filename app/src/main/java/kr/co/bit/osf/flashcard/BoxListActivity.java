@@ -320,6 +320,11 @@ public class BoxListActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, CreditActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.coba2:
+                Dlog.i("credit");
+                Intent intent2 = new Intent(this, CekGetGambar.class);
+                startActivity(intent2);
+                break;
         }
 
         return super.onOptionsItemSelected(item);

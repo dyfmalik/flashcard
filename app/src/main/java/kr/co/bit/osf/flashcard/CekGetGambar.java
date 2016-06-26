@@ -7,17 +7,23 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -41,13 +47,17 @@ public class CekGetGambar extends AppCompatActivity
         public TextView messengerTextView;
         public ImageView messengerImageView;
 
-        public MessageViewHolder(View v) {
-            super(v);
+        public MessageViewHolder(View itemView) {
+            super(itemView);
             messageTextView = (TextView) itemView.findViewById(R.id.messageTextView);
             messengerTextView = (TextView) itemView.findViewById(R.id.messengerTextView);
             messengerImageView = (ImageView) itemView.findViewById(R.id.messengerImageView);
+
         }
+
+
     }
+
     // Firebase instance variables
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -66,22 +76,23 @@ public class CekGetGambar extends AppCompatActivity
     private Button mSendButton;
     private RecyclerView mMessageRecyclerView;
     private LinearLayoutManager mLinearLayoutManager;
+    private GridLayoutManager mGridLayoutManager;
     private ProgressBar mProgressBar;
     private EditText mMessageEditText;
+
+
 
     // Firebase instance variables
     private DatabaseReference mFirebaseDatabaseReference;
     private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cek_get_gambar);
+        //MessageViewHolder=new RecyclerViewHolders(messageRecyclerView);
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         // Set default username is anonymous.
@@ -92,13 +103,16 @@ public class CekGetGambar extends AppCompatActivity
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         if (mFirebaseUser == null) {
             // Not signed in, launch the Sign In activity
-            //startActivity(new Intent(this, SignInActivity.class));
+            Toast.makeText(CekGetGambar.this, "Gagal", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, SignUpActivity.class));
             finish();
             return;
         } else {
             mUsername = mFirebaseUser.getDisplayName();
+            Toast.makeText(CekGetGambar.this, "Berhasil", Toast.LENGTH_SHORT).show();
             if (mFirebaseUser.getPhotoUrl() != null) {
                 mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
+
             }
         }
 
@@ -110,9 +124,11 @@ public class CekGetGambar extends AppCompatActivity
         // Initialize ProgressBar and RecyclerView.
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mMessageRecyclerView = (RecyclerView) findViewById(R.id.messageRecyclerView);
+        mGridLayoutManager = new GridLayoutManager(this, 3);
         mLinearLayoutManager = new LinearLayoutManager(this);
-        mLinearLayoutManager.setStackFromEnd(false);
-        mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
+        //mLinearLayoutManager.setStackFromEnd(false);
+        //mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mMessageRecyclerView.setLayoutManager(mGridLayoutManager);
 
         // New child entries
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
@@ -122,6 +138,7 @@ public class CekGetGambar extends AppCompatActivity
                 R.layout.item_message,
                 MessageViewHolder.class,
                 mFirebaseDatabaseReference.child(MESSAGES_CHILD)) {
+
 
             @Override
             protected void populateViewHolder(MessageViewHolder viewHolder,
@@ -134,6 +151,7 @@ public class CekGetGambar extends AppCompatActivity
                             .setImageDrawable(ContextCompat
                                     .getDrawable(CekGetGambar.this,
                                             R.drawable.ic_account_circle_black_36dp));
+                    Toast.makeText(CekGetGambar.this, "Gagal", Toast.LENGTH_SHORT).show();
                 } else {
                     Glide.with(CekGetGambar.this)
                             .load(friendlyMessage.getPhotoUrl())
@@ -148,7 +166,8 @@ public class CekGetGambar extends AppCompatActivity
                 super.onItemRangeInserted(positionStart, itemCount);
                 int friendlyMessageCount = mFirebaseAdapter.getItemCount();
                 int lastVisiblePosition =
-                        mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
+                        //mLinearLayoutManager.findLastCompletelyVisibleItemPosition();
+                        mGridLayoutManager.findLastCompletelyVisibleItemPosition();
                 // If the recycler view is initially being loaded or the
                 // user is at the bottom of the list, scroll to the bottom
                 // of the list to show the newly added message.
@@ -160,7 +179,8 @@ public class CekGetGambar extends AppCompatActivity
             }
         });
 
-        mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
+        //mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
+        mMessageRecyclerView.setLayoutManager(mGridLayoutManager);
         mMessageRecyclerView.setAdapter(mFirebaseAdapter);
 
         mMessageEditText = (EditText) findViewById(R.id.messageEditText);
@@ -198,5 +218,53 @@ public class CekGetGambar extends AppCompatActivity
                 mMessageEditText.setText("");
             }
         });
+    }
+
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in.
+        // TODO: Add code to check if user is signed in.
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        /*switch (item.getItemId()) {
+            case R.id.sign_out_menu:
+                mFirebaseAuth.signOut();
+                Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+                mUsername = ANONYMOUS;
+                startActivity(new Intent(this, SignInActivity.class));
+                return true;
+            default:
+
+        }*/return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
+        // be available.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+        Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
     }
 }

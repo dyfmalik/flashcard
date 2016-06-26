@@ -24,6 +24,10 @@
         <item
             android:id="@+id/box_list_menu_sort_reset"
             android:title="@string/actionbar_menu_sort_reset" />
+        <item
+            android:id="@+id/coba2"
+            android:title="coba2" />
+
     </group>
     <group android:id="@+id/box_list_menu_group2">
         <item
