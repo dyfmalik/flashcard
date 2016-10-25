@@ -1,5 +1,6 @@
 package kr.co.bit.osf.flashcard;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -14,9 +15,11 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,10 +35,19 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.android.gms.auth.api.Auth;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.List;
+
+import kr.co.bit.osf.flashcard.common.IntentRequestCode;
+import kr.co.bit.osf.flashcard.db.CardDTO;
+import kr.co.bit.osf.flashcard.db.FlashCardDB;
+import kr.co.bit.osf.flashcard.debug.Dlog;
 
 
 public class CekGetGambar extends AppCompatActivity
@@ -58,6 +70,11 @@ public class CekGetGambar extends AppCompatActivity
 
     }
 
+
+
+
+
+
     // Firebase instance variables
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
@@ -79,7 +96,9 @@ public class CekGetGambar extends AppCompatActivity
     private GridLayoutManager mGridLayoutManager;
     private ProgressBar mProgressBar;
     private EditText mMessageEditText;
-
+    List<CardDTO> cardList = null;
+    // db
+    FlashCardDB db = null;
 
 
     // Firebase instance variables
@@ -132,6 +151,9 @@ public class CekGetGambar extends AppCompatActivity
 
         // New child entries
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mFirebaseDatabaseReference.keepSynced(true);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
         mFirebaseAdapter = new FirebaseRecyclerAdapter<FriendlyMessage,
                 MessageViewHolder>(
                 FriendlyMessage.class,
@@ -141,9 +163,27 @@ public class CekGetGambar extends AppCompatActivity
 
 
             @Override
-            protected void populateViewHolder(MessageViewHolder viewHolder,
-                                              FriendlyMessage friendlyMessage, int position) {
-                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+            protected void populateViewHolder(final MessageViewHolder viewHolder,
+                                              final FriendlyMessage friendlyMessage, int position) {
+
+               /* mFirebaseDatabaseReference.child(MESSAGES_CHILD).addListenerForSingleValueEvent(new ValueEventListener() {
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        *//*String name = dataSnapshot.child("name").getValue(String.class);
+                        ((TextView)viewHolder.itemView.findViewById(android.R.id.text1)).setText(name);*//*
+                        mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+                        viewHolder.messageTextView.setText(friendlyMessage.getText());
+                        viewHolder.messengerTextView.setText(friendlyMessage.getName());
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+
+                });*/
+
+
+               mProgressBar.setVisibility(ProgressBar.INVISIBLE);
                 viewHolder.messageTextView.setText(friendlyMessage.getText());
                 viewHolder.messengerTextView.setText(friendlyMessage.getName());
                 if (friendlyMessage.getPhotoUrl() == null) {
@@ -218,6 +258,28 @@ public class CekGetGambar extends AppCompatActivity
                 mMessageEditText.setText("");
             }
         });
+
+
+        mMessageRecyclerView.addOnItemTouchListener(
+                new RecyclerClickListener(this, new RecyclerClickListener.OnItemClickListener() {
+                    @Override public void onItemClick(View view, int position) {
+
+                        TextView text=(TextView) view.findViewById(R.id.messageTextView);
+
+                        //Toast.makeText(view.getContext(), "Clicked Country Position = " + position, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(view.getContext(), "Clicked Country Position = " + text.getText() , Toast.LENGTH_SHORT).show();
+                        // card view
+                        int boxId = cardList.get(position).getBoxId();
+                        int cardId = cardList.get(position).getId();
+                        //db.updateState(boxId, cardId);
+                        Intent intent = new Intent(getApplicationContext(), CardViewActivity.class);
+                        startActivityForResult(intent, IntentRequestCode.CARD_VIEW);
+                        Dlog.i("startActivityForResult");
+
+
+                    }
+                })
+        );
     }
 
 
