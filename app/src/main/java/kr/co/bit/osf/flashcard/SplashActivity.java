@@ -22,8 +22,8 @@ public class SplashActivity extends Activity{
     Runnable mrun = new Runnable() {
         @Override
         public void run() {
-            //Intent i = new Intent(SplashActivity.this, BoxListActivity.class);
-            Intent i = new Intent(SplashActivity.this, SignUpActivity.class);
+            Intent i = new Intent(SplashActivity.this, BoxListActivity.class);
+            //Intent i = new Intent(SplashActivity.this, SignUpActivity.class);
             startActivity(i);
             finish();
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);

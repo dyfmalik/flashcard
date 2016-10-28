@@ -16,7 +16,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SplashActivity">
+        <activity
+            android:name=".SplashActivity"
+            android:label="@string/title_activity_box_list"
+            android:theme="@android:style/Theme.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,7 +28,7 @@
         </activity>
         <activity
             android:name=".BoxListActivity"
-            android:label="@string/title_activity_box_list" />
+            android:label="@string/title_activity_box_list"></activity>
         <activity
             android:name=".CardListActivity"
             android:label="@string/title_activity_card_list" />
@@ -35,10 +38,7 @@
         <activity
             android:name=".CardEditActivity"
             android:label="@string/title_activity_card_edit" />
-        <activity android:name=".CreditActivity" />
-        <activity android:name=".ImageGoogle" />
-        <activity android:name=".SignUpActivity" />
-        <activity android:name=".CekGetGambar"></activity>
+        <activity android:name=".CreditActivity"></activity>
     </application>
 
 </manifest>

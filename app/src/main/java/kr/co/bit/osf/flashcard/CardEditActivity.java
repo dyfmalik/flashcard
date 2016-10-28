@@ -1,39 +1,23 @@
 package kr.co.bit.osf.flashcard;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
 
 import kr.co.bit.osf.flashcard.common.ImageUtil;
 import kr.co.bit.osf.flashcard.common.IntentExtrasName;
@@ -41,20 +25,6 @@ import kr.co.bit.osf.flashcard.common.IntentRequestCode;
 import kr.co.bit.osf.flashcard.db.CardDTO;
 import kr.co.bit.osf.flashcard.db.FlashCardDB;
 import kr.co.bit.osf.flashcard.debug.Dlog;
-import kr.co.bit.osf.flashcard.models.Post;
-import kr.co.bit.osf.flashcard.models.User;
-
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
 
 public class CardEditActivity extends AppCompatActivity {
     // dto
@@ -75,39 +45,10 @@ public class CardEditActivity extends AppCompatActivity {
     private String activityStateDataName = "activityStateDataName";
     private ActivityState currentState;
 
-    //by me
-    private Uri mDownloadUrl = null;
-    private Uri mFileUri = null;
-    //by me
-    private static final String KEY_FILE_URI = "key_file_uri";
-    private static final String KEY_DOWNLOAD_URL = "key_download_url";
-    private static final String TAG = "Storage#MainActivity";
-    private ProgressDialog mProgressDialog;
-    // [START declare_ref]
-    private StorageReference mStorageRef;
-    private DatabaseReference mDatabase;
-    // [END declare_ref]
-    private BroadcastReceiver mDownloadReceiver;
-    //by me
-    TextView textLink;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_edit);
-
-
-        //by me
-        if (savedInstanceState != null) {
-            mFileUri = savedInstanceState.getParcelable(KEY_FILE_URI);
-            mDownloadUrl = savedInstanceState.getParcelable(KEY_DOWNLOAD_URL);
-        }
-        mStorageRef = FirebaseStorage.getInstance().getReference();
-        textLink=(TextView)findViewById(R.id.textViewLink);
-
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-
-        //
-
 
         Dlog.i("started");
 
@@ -225,7 +166,6 @@ public class CardEditActivity extends AppCompatActivity {
                     if (intentRequestCode == IntentRequestCode.CARD_ADD) {
                         Dlog.i("yes button:check:ok:add" + card);
                         db.addCard(card);
-                        //submitPost();
                     } else {
                         Dlog.i("yes button:check:ok:update" + card);
                         db.updateCard(card);
@@ -244,108 +184,6 @@ public class CardEditActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-
-
-
-        //by me
-        // Download receiver
-        mDownloadReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.d(TAG, "downloadReceiver:onReceive:" + intent);
-                hideProgressDialog();
-
-                if (MyDownloadService.ACTION_COMPLETED.equals(intent.getAction())) {
-                    String path = intent.getStringExtra(MyDownloadService.EXTRA_DOWNLOAD_PATH);
-                    long numBytes = intent.getLongExtra(MyDownloadService.EXTRA_BYTES_DOWNLOADED, 0);
-
-                    // Alert success
-                    showMessageDialog("Success", String.format(Locale.getDefault(),
-                            "%d bytes downloaded from %s", numBytes, path));
-                }
-
-                if (MyDownloadService.ACTION_ERROR.equals(intent.getAction())) {
-                    String path = intent.getStringExtra(MyDownloadService.EXTRA_DOWNLOAD_PATH);
-
-                    // Alert failure
-                    showMessageDialog("Error", String.format(Locale.getDefault(),
-                            "Failed to download from %s", path));
-                }
-            }
-        };
-        //by me
-    }
-    //by me
-    private void submitPost() {
-        // [START single_value_read]
-        final String userId = getUid();
-        mDatabase.child("users").child(userId).addListenerForSingleValueEvent(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        // Get user value
-                        User user = dataSnapshot.getValue(User.class);
-
-                        // [START_EXCLUDE]
-                        if (user == null) {
-                            // User is null, error out
-                            Log.e(TAG, "User " + userId + " is unexpectedly null");
-                            Toast.makeText(CardEditActivity.this,
-                                    "Error: could not fetch user.",
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            // Write new post
-                            String body="body";
-                            writeNewPost(userId, user.username,  cardEditTextView.getText().toString(), body);
-                        }
-
-                        // Finish this Activity, back to the stream
-                        finish();
-                        // [END_EXCLUDE]
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.w(TAG, "getUser:onCancelled", databaseError.toException());
-                    }
-                });
-        // [END single_value_read]
-    }
-
-    //by me
-    public String getUid() {
-        return FirebaseAuth.getInstance().getCurrentUser().getUid();
-    }
-    public void save(View v)
-    {
-        submitPost();
-        Toast.makeText(CardEditActivity.this,"berhasil", Toast.LENGTH_SHORT).show();
-    }
-    //by me
-    // [START write_fan_out]
-    private void writeNewPost(String userId, String username, String title, String body) {
-        // Create new post at /user-posts/$userid/$postid and at
-        // /posts/$postid simultaneously
-        String key = mDatabase.child("posts").push().getKey();
-        Post post = new Post(userId, username, title, body);
-        Map<String, Object> postValues = post.toMap();
-
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/posts/" + key, postValues);
-        childUpdates.put("/user-posts/" + userId + "/" + key, postValues);
-
-        mDatabase.updateChildren(childUpdates);
-    }
-    // [END write_fan_out]
-
-    //by me for downloading downloadpath
-    private void showMessageDialog(String title, String message) {
-        android.support.v7.app.AlertDialog ad = new android.support.v7.app.AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(message)
-                .create();
-        ad.show();
     }
 
     private void imageClicked() {
@@ -355,7 +193,6 @@ public class CardEditActivity extends AppCompatActivity {
         final CharSequence[] items = {
                 getString(R.string.card_edit_image_dialog_camera_button_text),
                 getString(R.string.card_edit_image_dialog_gallery_button_text),
-                "Ambil Dari Google"
         };
         AlertDialog.Builder builder = new AlertDialog.Builder(CardEditActivity.this);
         TextView editTitle = (TextView)dlg.findViewById(R.id.dialogTitleTextView);
@@ -374,18 +211,12 @@ public class CardEditActivity extends AppCompatActivity {
                 Dlog.i("cardEdit:photoCaptureButton clicked");
                 photoFilePath = photoFile.getAbsolutePath();
 
-                //by me
-
-
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                mFileUri = Uri.fromFile(photoFile);
                 if (intent.resolveActivity(getPackageManager()) != null) {
                     startActivityForResult(intent, IntentRequestCode.CAPTURE_IMAGE);
                 }
                 dialogInterface.dismiss();
-
-
             }
         });
 
@@ -407,85 +238,9 @@ public class CardEditActivity extends AppCompatActivity {
             }
 
         });
-       /* builder.setView(dlg);
-        dialogInterface = builder.show();*/
-
-
-        //get from google
-        TextView editmenuThree = (TextView)dlg.findViewById(R.id.dialogMenuTextViewThree_);
-        editmenuThree.setText("Get From Google");
-        editmenuThree.setVisibility(View.VISIBLE);
-        editmenuThree.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Dlog.i("cardEdit:GoogleButton clicked");
-                // select card in gallery
-                Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                intent.setType("image*//*");
-                startActivityForResult(
-                        Intent.createChooser(intent, "Select Picture"),
-                        IntentRequestCode.SELECT_PICTURE);
-                Toast.makeText(CardEditActivity.this, "Google has clicked", Toast.LENGTH_SHORT).show();
-                dialogInterface.dismiss();
-            }
-
-        });
         builder.setView(dlg);
         dialogInterface = builder.show();
     }
-
-    //by me [START upload_from_uri]
-    private void uploadFromUri(Uri fileUri) {
-        Log.d(TAG, "uploadFromUri:src:" + fileUri.toString());
-
-        // [START get_child_ref]
-        // Get a reference to store file at photos/<FILENAME>.jpg
-        final StorageReference photoRef = mStorageRef.child("photos")
-                .child(fileUri.getLastPathSegment());
-        // [END get_child_ref]
-
-        // Upload file to Firebase Storage
-        // [START_EXCLUDE]
-        showProgressDialog();
-        // [END_EXCLUDE]
-        Log.d(TAG, "uploadFromUri:dst:" + photoRef.getPath());
-        photoRef.putFile(fileUri)
-                .addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // Upload succeeded
-                        Log.d(TAG, "uploadFromUri:onSuccess");
-
-                        // Get the public download URL
-                        mDownloadUrl = taskSnapshot.getMetadata().getDownloadUrl();
-
-
-                        // [START_EXCLUDE]
-                        hideProgressDialog();
-                        //by me
-                        textLink.setText(mDownloadUrl.toString());
-                        //updateUI(mAuth.getCurrentUser());
-                        // [END_EXCLUDE]
-                    }
-                })
-                .addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Upload failed
-                        Log.w(TAG, "uploadFromUri:onFailure", exception);
-
-                        mDownloadUrl = null;
-
-                        // [START_EXCLUDE]
-                        hideProgressDialog();
-                        Toast.makeText(CardEditActivity.this, "Error: upload failed",
-                                Toast.LENGTH_SHORT).show();
-                        //updateUI(mAuth.getCurrentUser());
-                        // [END_EXCLUDE]
-                    }
-                });
-    }
-    // [END upload_from_uri]
 
     private void textClicked() {
 
@@ -546,7 +301,6 @@ public class CardEditActivity extends AppCompatActivity {
                     ImageUtil.loadCardImageIntoImageView(this, card, imageView);
                     Dlog.i("photoFilePath:" + card.getImagePath());
                     Dlog.i("photoFilePath:" + card.getImagePath());
-                    uploadFromUri(mFileUri);
                     break;
             }
         }
@@ -584,11 +338,6 @@ public class CardEditActivity extends AppCompatActivity {
                 photoFilePath, card);
         outState.putParcelable(activityStateDataName, currentState);
         Dlog.i(currentState.toString());
-
-        //by me
-        outState.putParcelable(KEY_FILE_URI, mFileUri);
-        outState.putParcelable(KEY_DOWNLOAD_URL, mDownloadUrl);
-        //
     }
 
     @Override
@@ -642,7 +391,7 @@ public class CardEditActivity extends AppCompatActivity {
             }
         }
 
-       // check text
+        // check text
         if (isOk) {
             try {
                 isOk = (card.getName().length() > 0);
@@ -782,40 +531,5 @@ public class CardEditActivity extends AppCompatActivity {
                     ", card=" + card +
                     '}';
         }
-    }
-
-
-    //by me
-    private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage("Loading...");
-            mProgressDialog.setIndeterminate(true);
-        }
-
-        mProgressDialog.show();
-    }
-
-    private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.dismiss();
-        }
-    }
-
-    //by me
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Register download receiver
-        LocalBroadcastManager.getInstance(this)
-                .registerReceiver(mDownloadReceiver, MyDownloadService.getIntentFilter());
-    }
-    //by me
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // Unregister download receiver
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mDownloadReceiver);
     }
 }

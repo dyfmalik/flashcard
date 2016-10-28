@@ -19,8 +19,6 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.firebase.auth.FirebaseAuth;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -95,7 +93,7 @@ public class BoxListActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Dlog.i("setOnItemClickListener:position:" + position);
                 if (!(db.updateState(boxList.get(position).getId(), 0))) {
-                    Dlog.i("state  : " + db.updateState(boxList.get(position).getId(),0));
+                    Dlog.i("state ?? ?? : " + db.updateState(boxList.get(position).getId(),0));
                 }
                 Intent intent = new Intent(getApplicationContext(), CardListActivity.class);
                 startActivityForResult(intent, IntentRequestCode.CARD_LIST_VIEW);
@@ -277,10 +275,7 @@ public class BoxListActivity extends AppCompatActivity {
                 input.show();
 
                 break;
-            case R.id.signUp:
-                FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(this, SignUpActivity.class));
-                break;
+            //??
             case R.id.box_list_menu_sort_asc:
                 Dlog.i("asc sort start");
                 Collections.sort(boxList, new NameAscCompare());
@@ -289,7 +284,7 @@ public class BoxListActivity extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
                 Dlog.i("asc sort end");
                 break;
-
+            //??
             case R.id.box_list_menu_sort_desc:
                 Dlog.i("desc sort start");
                 Collections.sort(boxList, new NameDescCompare());
@@ -298,7 +293,7 @@ public class BoxListActivity extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
                 Dlog.i("desc sort end");
                 break;
-
+            //???
             case R.id.box_list_menu_sort_shuffle:
                 Dlog.i("shuffle start");
                 Collections.shuffle(boxList);
@@ -319,11 +314,6 @@ public class BoxListActivity extends AppCompatActivity {
                 Dlog.i("credit");
                 Intent intent = new Intent(this, CreditActivity.class);
                 startActivity(intent);
-                break;
-            case R.id.coba2:
-                Dlog.i("credit");
-                Intent intent2 = new Intent(this, CekGetGambar.class);
-                startActivity(intent2);
                 break;
         }
 
@@ -422,9 +412,16 @@ public class BoxListActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-
+    /**
+     * ?? ????
+     *
+     * @author falbb
+     */
     static class NameAscCompare implements Comparator<BoxDTO> {
 
+        /**
+         * ????(ASC)
+         */
         @Override
         public int compare(BoxDTO arg0, BoxDTO arg1) {
             return arg0.getName().compareTo(arg1.getName());
@@ -432,18 +429,32 @@ public class BoxListActivity extends AppCompatActivity {
 
     }
 
-
+    /**
+     * ?? ????
+     *
+     * @author falbb
+     */
     static class NameDescCompare implements Comparator<BoxDTO> {
 
-
+        /**
+         * ????(DESC)
+         */
         @Override
         public int compare(BoxDTO arg0, BoxDTO arg1) {
             return arg1.getName().compareTo(arg0.getName());
         }
     }
 
-
+    /**
+     * No ????
+     * @author falbb
+     *
+     */
     static class NoAscCompare implements Comparator<BoxDTO> {
+
+        /**
+         * ????(ASC)
+         */
         @Override
         public int compare(BoxDTO arg0, BoxDTO arg1) {
             return arg0.getId() < arg1.getId() ? -1 : arg0.getId() > arg1.getId() ? 1:0;
