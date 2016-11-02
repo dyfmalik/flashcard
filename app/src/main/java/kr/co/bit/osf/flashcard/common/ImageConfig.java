@@ -21,7 +21,7 @@ import kr.co.bit.osf.flashcard.db.CardDTO;
 import kr.co.bit.osf.flashcard.db.FlashCardDB;
 import kr.co.bit.osf.flashcard.debug.Dlog;
 
-public class ImageUtil {
+public class ImageConfig {
     private static final String TAG = "ImageUtilLog";
 
     public static final String ALBUM_NAME = "FlashCard";

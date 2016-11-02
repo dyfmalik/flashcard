@@ -15,7 +15,7 @@ import kr.co.bit.osf.flashcard.common.ActivityId;
 
 // http://www.androidhive.info/2013/09/android-sqlite-database-with-multiple-tables/
 public class FlashCardDB extends SQLiteOpenHelper
-        implements BoxDAO, CardDAO, StateDAO, HelpCountDAO {
+        implements IBoxDAO, CardDAO, StateDAO, HelpCountDAO {
     // context
     Context context = null;
 

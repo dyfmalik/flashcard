@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import kr.co.bit.osf.flashcard.common.ImageUtil;
+import kr.co.bit.osf.flashcard.common.ImageConfig;
 import kr.co.bit.osf.flashcard.common.IntentExtrasName;
 import kr.co.bit.osf.flashcard.common.IntentRequestCode;
 import kr.co.bit.osf.flashcard.common.IntentReturnCode;
@@ -197,7 +197,7 @@ public class CardViewActivity extends AppCompatActivity {
             PagerHolder holder = new PagerHolder(list.get(position), position,
                     imageView, textView, flipAnimator);
             // image
-            ImageUtil.loadCardImageIntoImageView(CardViewActivity.this, holder.getCard(), imageView);
+            ImageConfig.loadCardImageIntoImageView(CardViewActivity.this, holder.getCard(), imageView);
             // text
             textView.setText(holder.getCard().getName());
 

@@ -1,12 +1,15 @@
 package kr.co.bit.osf.flashcard;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,7 +21,22 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.MalformedURLException;
+
+
+import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -34,7 +52,7 @@ import kr.co.bit.osf.flashcard.db.FlashCardDB;
 import kr.co.bit.osf.flashcard.db.StateDTO;
 import kr.co.bit.osf.flashcard.debug.Dlog;
 
-public class BoxListActivity extends AppCompatActivity {
+public class BoxListActivity_ extends AppCompatActivity {
     // db
     private FlashCardDB db = null;
     private List<BoxDTO> boxList = null;
@@ -44,12 +62,24 @@ public class BoxListActivity extends AppCompatActivity {
     //dialog
     private DialogInterface dialogInterface = null;
 
+    //by me
+    ProgressDialog progressDialog;
+    ArrayList<CardDTO> rest;
+    String Error;
+    String cid="tai kucing";
+    String total;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_box_list);
         Dlog.i("");
 
+        //by me
+        String total_="bitch";
+        Log.d("URL", "" + total_);
+        new init().execute();
+        //getDataFromDb();
         // read state from db
         //commented by me
         db = new FlashCardDB(this);
@@ -94,7 +124,7 @@ public class BoxListActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Dlog.i("setOnItemClickListener:position:" + position);
                 if (!(db.updateState(boxList.get(position).getId(), 0))) {
-                    Dlog.i("state ?? ?? : " + db.updateState(boxList.get(position).getId(),0));
+                    Dlog.i("state ?? ?? : " + db.updateState(boxList.get(position).getId(), 0));
                 }
                 Intent intent = new Intent(getApplicationContext(), CardListActivity.class);
                 startActivityForResult(intent, IntentRequestCode.CARD_LIST_VIEW);
@@ -107,9 +137,9 @@ public class BoxListActivity extends AppCompatActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
                 // get user action from dialog
                 Dlog.i("Item long click dialog: start");
-                View dlg = BoxListActivity.this.getLayoutInflater().inflate(R.layout.edit_dialog_title, null);
+                View dlg = BoxListActivity_.this.getLayoutInflater().inflate(R.layout.edit_dialog_title, null);
                 Dlog.i("Item long click dialog - add View");
-                AlertDialog.Builder builder = new AlertDialog.Builder(BoxListActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(BoxListActivity_.this);
                 Dlog.i("Item long click dialog - add AlertDialog.Builder");
                 TextView textView1 = (TextView) dlg.findViewById(R.id.dialogMenuTextViewOne);
                 TextView textView2 = (TextView) dlg.findViewById(R.id.dialogMenuTextViewTwo);
@@ -125,7 +155,7 @@ public class BoxListActivity extends AppCompatActivity {
                     public void onClick(View v) {
 
                         Dlog.i("dialog:edit box");
-                        View dlg2 = BoxListActivity.this.getLayoutInflater().inflate(R.layout.edit_dialog_title, null);
+                        View dlg2 = BoxListActivity_.this.getLayoutInflater().inflate(R.layout.edit_dialog_title, null);
                         final EditText inputText = (EditText) dlg2.findViewById(R.id.dialogMenuEditTextOne);
                         TextView textView = (TextView) dlg2.findViewById(R.id.dialogTitleTextView);
                         TextView textView2 = (TextView) dlg2.findViewById(R.id.dialogMenuTextViewOne);
@@ -136,7 +166,7 @@ public class BoxListActivity extends AppCompatActivity {
                         Dlog.i("dialog:edit box - set VISIBLE");
                         inputText.setText(boxList.get(position).getName());
                         inputText.setSelection(inputText.length());
-                        AlertDialog.Builder input = new AlertDialog.Builder(BoxListActivity.this);
+                        AlertDialog.Builder input = new AlertDialog.Builder(BoxListActivity_.this);
                         textView.setText(R.string.box_edit_dialog_edit_title);
                         textView2.setText(R.string.box_edit_dialog_edit_message);
                         Dlog.i("dialog:edit box - set text");
@@ -163,7 +193,7 @@ public class BoxListActivity extends AppCompatActivity {
                     public void onClick(View v) {
 
                         Dlog.i("dialog:delete box");
-                        View dlg2 = BoxListActivity.this.getLayoutInflater().inflate(R.layout.edit_dialog_title, null);
+                        View dlg2 = BoxListActivity_.this.getLayoutInflater().inflate(R.layout.edit_dialog_title, null);
                         Dlog.i("dialog:delete box - create View");
                         TextView deleteTitle = (TextView) dlg2.findViewById(R.id.dialogTitleTextView);
                         TextView deleteMessage = (TextView) dlg2.findViewById(R.id.dialogMenuTextViewOne);
@@ -171,7 +201,7 @@ public class BoxListActivity extends AppCompatActivity {
                         deleteTitle.setVisibility(View.VISIBLE);
                         deleteMessage.setVisibility(View.VISIBLE);
                         Dlog.i("dialog:delete box - item VISIBLE");
-                        final AlertDialog.Builder delete = new AlertDialog.Builder(BoxListActivity.this);
+                        final AlertDialog.Builder delete = new AlertDialog.Builder(BoxListActivity_.this);
                         deleteTitle.setText(R.string.box_edit_dialog_delete_title);
                         deleteMessage.setText(R.string.box_edit_dialog_delete_message);
                         delete.setView(dlg2);
@@ -211,8 +241,8 @@ public class BoxListActivity extends AppCompatActivity {
     //menu option
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if(menu == null){
-            Dlog.i("menu is null : " + menu );
+        if (menu == null) {
+            Dlog.i("menu is null : " + menu);
             finish();
         }
         Dlog.i("onCreateOptionMenu : " + "OK");
@@ -222,7 +252,7 @@ public class BoxListActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item == null && boxList == null){
+        if (item == null && boxList == null) {
             Dlog.i("item : " + item + " boxList : " + boxList.toString());
             finish();
         }
@@ -232,7 +262,7 @@ public class BoxListActivity extends AppCompatActivity {
             // set an EditText view to get user input
             case R.id.box_list_menu_add:
                 Dlog.i("dialog:add box");
-                View dlg = BoxListActivity.this.getLayoutInflater().inflate(R.layout.edit_dialog_title, null);
+                View dlg = BoxListActivity_.this.getLayoutInflater().inflate(R.layout.edit_dialog_title, null);
                 final EditText inputText = (EditText) dlg.findViewById(R.id.dialogMenuEditTextOne);
                 TextView titleTextView = (TextView) dlg.findViewById(R.id.dialogTitleTextView);
                 TextView textView = (TextView) dlg.findViewById(R.id.dialogMenuTextViewOne);
@@ -243,7 +273,7 @@ public class BoxListActivity extends AppCompatActivity {
                 inputText.setVisibility(View.VISIBLE);
                 textView.setVisibility(View.VISIBLE);
                 Dlog.i("dialog Item setVisible");
-                AlertDialog.Builder input = new AlertDialog.Builder(BoxListActivity.this);
+                AlertDialog.Builder input = new AlertDialog.Builder(BoxListActivity_.this);
                 Dlog.i("dialog create");
                 input.setView(dlg);
                 input.setPositiveButton(R.string.box_edit_dialog_add_ok_button_text,
@@ -305,7 +335,7 @@ public class BoxListActivity extends AppCompatActivity {
                 break;
             case R.id.box_list_menu_sort_reset:
                 Dlog.i("Id Asc start");
-                Collections.sort(boxList,new NoAscCompare());
+                Collections.sort(boxList, new NoAscCompare());
                 Dlog.i("Id Asc - collections sort call");
                 db.updateBoxSeq(boxList);
                 adapter.notifyDataSetChanged();
@@ -335,7 +365,8 @@ public class BoxListActivity extends AppCompatActivity {
         private Context context;
         private List<BoxDTO> list;
 
-        public BoxListAdapter() {}
+        public BoxListAdapter() {
+        }
 
         public BoxListAdapter(Context c, List<BoxDTO> list) {
             context = c;
@@ -374,7 +405,7 @@ public class BoxListActivity extends AppCompatActivity {
             CardDTO topCard = db.getTopCardByBoxId(list.get(position).getId());
             if (topCard != null) {
                 Dlog.i("topCard:" + topCard);
-                ImageConfig.loadCardImageIntoImageView(BoxListActivity.this, topCard, imageView);
+                ImageConfig.loadCardImageIntoImageView(BoxListActivity_.this, topCard, imageView);
             } else {
                 Dlog.i("empty_image");
                 imageView.setImageResource(R.drawable.default_image_empty_image);
@@ -393,7 +424,7 @@ public class BoxListActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Dlog.i("requestCode=" + requestCode + ",resultCode=" + resultCode);
-        if(data == null){
+        if (data == null) {
             finish();
             return;
         }
@@ -402,11 +433,11 @@ public class BoxListActivity extends AppCompatActivity {
             Dlog.i("returnCode=");
             switch (returnCode) {
                 case IntentReturnCode.BOX_LIST_REFRESH:
-                    Dlog.i("Box_List_REFRESH : " + IntentReturnCode.BOX_LIST_REFRESH );
+                    Dlog.i("Box_List_REFRESH : " + IntentReturnCode.BOX_LIST_REFRESH);
                     adapter.notifyDataSetChanged();
                     break;
                 default:
-                    Dlog.i("BoxListREFRESH error : " + IntentReturnCode.BOX_LIST_REFRESH );
+                    Dlog.i("BoxListREFRESH error : " + IntentReturnCode.BOX_LIST_REFRESH);
                     return;
             }
         }
@@ -448,8 +479,8 @@ public class BoxListActivity extends AppCompatActivity {
 
     /**
      * No ????
-     * @author falbb
      *
+     * @author falbb
      */
     static class NoAscCompare implements Comparator<BoxDTO> {
 
@@ -458,8 +489,109 @@ public class BoxListActivity extends AppCompatActivity {
          */
         @Override
         public int compare(BoxDTO arg0, BoxDTO arg1) {
-            return arg0.getId() < arg1.getId() ? -1 : arg0.getId() > arg1.getId() ? 1:0;
+            return arg0.getId() < arg1.getId() ? -1 : arg0.getId() > arg1.getId() ? 1 : 0;
         }
+
+    }
+
+    public class init extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(BoxListActivity_.this);
+            progressDialog.setMessage("Load for data");
+
+            progressDialog.setCancelable(true);
+            progressDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            getDataFromDb();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (Error != null) {
+                if (progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+                Toast.makeText(BoxListActivity_.this, "there is no data found", Toast.LENGTH_LONG).show();
+
+            }
+            else
+            {
+                if (progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                    try {
+                        Toast.makeText(BoxListActivity_.this, total, Toast.LENGTH_LONG).show();
+                    }
+                    catch (NullPointerException e){
+                    }
+
+                }
+            }
+
+        }
+
+    }
+
+    private void getDataFromDb() {
+        //Toast.makeText(this,"cek",Toast.LENGTH_LONG).show();
+
+        URL hp = null;
+        try {
+            rest.clear();
+
+            hp = new URL("http://localhost/flashcard/webservice/getCards.php");
+            URLConnection hpCon = hp.openConnection();
+            hpCon.connect();
+            InputStream input = hpCon.getInputStream();
+            BufferedReader r = new BufferedReader(new InputStreamReader(input));
+
+
+            String x = "";
+            x = r.readLine();
+            total = "";
+
+            while (x != null) {
+                total += x;
+                x = r.readLine();
+            }
+            Log.d("URL", "" + total);
+            JSONObject j = new JSONObject(total);
+            Log.d("total", "" + j);
+            //Toast.makeText(this, total, Toast.LENGTH_LONG).show();
+
+            Log.d("jsonobject", "" + j);
+            /*for (int i = 0; i < j.length(); i++) {
+                JSONObject obj = j.getJSONObject("cards");
+                cid=obj.getString("cid");
+
+            }*/
+
+
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Error = e.getMessage();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            Error = e.getMessage();
+        }
+            catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                Error = e.getMessage();
+
+        } catch (NullPointerException e) {
+            // TODO: handle exception
+            Error = e.getMessage();
+        }
+
 
     }
 }

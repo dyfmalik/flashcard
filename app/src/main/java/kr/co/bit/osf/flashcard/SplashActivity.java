@@ -22,7 +22,7 @@ public class SplashActivity extends Activity{
     Runnable mrun = new Runnable() {
         @Override
         public void run() {
-            Intent i = new Intent(SplashActivity.this, BoxListActivity.class);
+            Intent i = new Intent(SplashActivity.this, BoxListActivity_.class);
             //Intent i = new Intent(SplashActivity.this, SignUpActivity.class);
             startActivity(i);
             finish();

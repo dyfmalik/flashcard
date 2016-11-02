@@ -2,7 +2,7 @@ package kr.co.bit.osf.flashcard.db;
 
 import java.util.List;
 
-public interface BoxDAO {
+public interface IBoxDAO {
     BoxDTO addBox(String name);
     BoxDTO getBox(String name);
     BoxDTO getBox(int id);

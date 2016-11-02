@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import kr.co.bit.osf.flashcard.common.ActivityId;
-import kr.co.bit.osf.flashcard.common.ImageUtil;
+import kr.co.bit.osf.flashcard.common.ImageConfig;
 import kr.co.bit.osf.flashcard.common.IntentExtrasName;
 import kr.co.bit.osf.flashcard.common.IntentRequestCode;
 import kr.co.bit.osf.flashcard.common.IntentReturnCode;
@@ -367,7 +367,7 @@ public class CardListActivity extends AppCompatActivity {
 
             String cardListName = cardList.get(position).getName();
             holder.textView.setText(cardListName);//이름
-            ImageUtil.loadCardImageIntoImageView(CardListActivity.this, cardList.get(position), holder.imageView);
+            ImageConfig.loadCardImageIntoImageView(CardListActivity.this, cardList.get(position), holder.imageView);
             convertView.setTag(holder);
 
             Dlog.i("position:" + position + ", box:" + cardList.get(position).getName());

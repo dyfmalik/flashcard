@@ -19,7 +19,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.List;
 
-import kr.co.bit.osf.flashcard.common.ImageUtil;
+import kr.co.bit.osf.flashcard.common.ImageConfig;
 import kr.co.bit.osf.flashcard.common.IntentExtrasName;
 import kr.co.bit.osf.flashcard.common.IntentRequestCode;
 import kr.co.bit.osf.flashcard.db.CardDTO;
@@ -123,7 +123,7 @@ public class CardEditActivity extends AppCompatActivity {
 
         //show card
         if (intentRequestCode == IntentRequestCode.CARD_EDIT) {
-            ImageUtil.loadCardImageIntoImageView(this, card, imageView);
+            ImageConfig.loadCardImageIntoImageView(this, card, imageView);
         }
         if (card.getName() != null) {
             cardEditTextView.setText(card.getName());
@@ -207,7 +207,7 @@ public class CardEditActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Dlog.i("cardEdit:photoCaptureButton clicked");
                 //capture card
-                photoFile = ImageUtil.getOutputMediaFile(ImageUtil.MEDIA_TYPE_IMAGE);
+                photoFile = ImageConfig.getOutputMediaFile(ImageConfig.MEDIA_TYPE_IMAGE);
                 Dlog.i("cardEdit:photoCaptureButton clicked");
                 photoFilePath = photoFile.getAbsolutePath();
 
@@ -292,13 +292,13 @@ public class CardEditActivity extends AppCompatActivity {
                 case IntentRequestCode.CAPTURE_IMAGE:
                 case IntentRequestCode.SELECT_PICTURE:
                     if (requestCode == IntentRequestCode.SELECT_PICTURE) {
-                        photoFilePath = ImageUtil.getImagePathFromIntentData(this, data);
+                        photoFilePath = ImageConfig.getImagePathFromIntentData(this, data);
                     }
                     card.setImagePath(photoFilePath);
                     card.setType(FlashCardDB.CardEntry.TYPE_USER);
                     Dlog.i("photoFilePath:" + photoFilePath);
                     Dlog.i("photoFilePath:" + card);
-                    ImageUtil.loadCardImageIntoImageView(this, card, imageView);
+                    ImageConfig.loadCardImageIntoImageView(this, card, imageView);
                     Dlog.i("photoFilePath:" + card.getImagePath());
                     Dlog.i("photoFilePath:" + card.getImagePath());
                     break;
@@ -320,7 +320,7 @@ public class CardEditActivity extends AppCompatActivity {
         photoFilePath = currentState.getPhotoFilePath();
         // image, text
         try {
-            ImageUtil.loadCardImageIntoImageView(this, currentState.getCard(), imageView);
+            ImageConfig.loadCardImageIntoImageView(this, currentState.getCard(), imageView);
             cardEditTextView.setText(getResources().getString(R.string.card_edit_text_view_hint));
             if (currentState.card.getName().length() > 0) {
                 cardEditTextView.setText(currentState.card.getName());

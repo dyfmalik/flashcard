@@ -69,4 +69,11 @@
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
     <string name="hint_password">password</string>
+
+   <!-- by me-->
+    <string name="liveurl">http://localhost.com/</string>
+    <string name="title_activity_card">CardActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 </resources>
