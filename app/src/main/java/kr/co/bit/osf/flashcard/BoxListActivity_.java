@@ -346,6 +346,11 @@ public class BoxListActivity_ extends AppCompatActivity {
                 Intent intent = new Intent(this, CreditActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.coba2:
+                Toast.makeText(this, "coba2",Toast.LENGTH_LONG).show();
+                Intent intent2 = new Intent(this, CardActivity.class);
+                startActivity(intent2);
+                break;
         }
 
         return super.onOptionsItemSelected(item);

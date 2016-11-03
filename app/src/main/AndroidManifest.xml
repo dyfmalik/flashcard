@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="kr.co.bit.osf.flashcard" >
-
+    package="kr.co.bit.osf.flashcard"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
     <application
+        tools:replace="android:icon"
         android:name=".BaseApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_flashcard"
@@ -45,6 +46,7 @@
             android:name=".CardActivity"
             android:label="@string/title_activity_card" >
         </activity>
+
     </application>
 
 </manifest>
