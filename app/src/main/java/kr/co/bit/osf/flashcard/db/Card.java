@@ -2,9 +2,6 @@ package kr.co.bit.osf.flashcard.db;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Created by Dyferdiansyah on 03/11/2016.
- */
 public class Card {
     @SerializedName("cid")
     public int cid;

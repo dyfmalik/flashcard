@@ -61,6 +61,7 @@ import kr.co.bit.osf.flashcard.db.BoxDTO;
 import kr.co.bit.osf.flashcard.db.Card;
 import kr.co.bit.osf.flashcard.db.CardDTO;
 import kr.co.bit.osf.flashcard.db.FlashCardDB;
+import kr.co.bit.osf.flashcard.db.Kategori;
 import kr.co.bit.osf.flashcard.db.StateDTO;
 import kr.co.bit.osf.flashcard.debug.Dlog;
 
@@ -68,6 +69,7 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
     // db
     private FlashCardDB db = null;
     private List<BoxDTO> boxList = null;
+
     // grid view
     //private GridView gridView = null;
     //private BoxListAdapter adapter = null;
@@ -78,6 +80,7 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
     ProgressDialog progressDialog;
     ArrayList<CardDTO> rest;
     String Error;
+    ArrayList<Kategori> kategoriList;
 
     String total;
     GridView gridView;
@@ -94,7 +97,7 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
         // read state from db
         //commented by me
         db = new FlashCardDB(this);
-        StateDTO cardState = db.getState();
+        final StateDTO cardState = db.getState();
         Dlog.i("read card state:" + cardState);
 
         // state.cardId > 0 : start card view activity
@@ -137,18 +140,29 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
         /*adapter = new BoxListAdapter(this, boxList);
         gridView.setAdapter(adapter);*/
 
+
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Dlog.i("setOnItemClickListener:position:" + position);
+                Dlog.i("posisigue" + position);
                 if (!(db.updateState(boxList.get(position).getId(), 0))) {
                     Dlog.i("state ?? ?? : " + db.updateState(boxList.get(position).getId(), 0));
                 }
-                Intent intent = new Intent(getApplicationContext(), CardListActivity.class);
-                startActivityForResult(intent, IntentRequestCode.CARD_LIST_VIEW);
-                Dlog.i("box:" + boxList.get(position));
+                Dlog.i("box:" + position);
+                Dlog.i("idgue:" + id);
+                //String position2=position;
+                Kategori kategori1=kategoriList.get(position);
+                String nama=kategori1.nama_kat;
+                int id_kat=kategori1.id_kat;
+
+                Toast.makeText(getApplicationContext(), Integer.toString(id_kat),Toast.LENGTH_SHORT).show();
+
+                /*Intent intent = new Intent(getApplicationContext(), CardListActivity.class);
+                startActivityForResult(intent, IntentRequestCode.CARD_LIST_VIEW);*/
+
             }
         });
+
         //long click dialog
         gridView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -388,18 +402,18 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
     @Override
     public void onResponse(String response) {
         Log.d("gue", response);
-        ArrayList<Card> cardlist=new JsonConverter<Card>().toArrayList(response,Card.class);
-        BindDictionary<Card> dictionary=new BindDictionary<>();
-        dictionary.addStringField(R.id.boxListViewItemText, new StringExtractor<Card>() {
+        kategoriList=new JsonConverter<Kategori>().toArrayList(response,Kategori.class);
+        BindDictionary<Kategori> dictionary=new BindDictionary<>();
+        dictionary.addStringField(R.id.boxListViewItemText, new StringExtractor<Kategori>() {
             @Override
-            public String getStringValue(Card card, int i) {
-                return card.cback;
+            public String getStringValue(Kategori kategori, int i) {
+                return kategori.nama_kat;
             }
         });
-        dictionary.addDynamicImageField(R.id.boxListViewItemImage, new StringExtractor<Card>() {
+        dictionary.addDynamicImageField(R.id.boxListViewItemImage, new StringExtractor<Kategori>() {
             @Override
-            public String getStringValue(Card card, int i) {
-                return card.url;
+            public String getStringValue(Kategori kategori, int i) {
+                return kategori.img_url;
             }
         }, new DynamicImageLoader() {
             @Override
@@ -409,7 +423,7 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
                 imageView.setAdjustViewBounds(true);*/
             }
         });
-        FunDapter<Card> adapter=new FunDapter<>(getApplicationContext(),cardlist,R.layout.activity_box_list_item_, dictionary);
+        FunDapter<Kategori> adapter=new FunDapter<>(getApplicationContext(),kategoriList,R.layout.activity_box_list_item_, dictionary);
         gridView.setAdapter(adapter);
     }
 
@@ -529,7 +543,7 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
 
     //by me
     private void getData(){
-        String url="http://10.0.2.2/flashcard/webservice/getCards.php";
+        String url="http://10.0.2.2/flashcard/webservice/getAllKategori.php";
 
         StringRequest stringRequest=new StringRequest(Request.Method.GET, url, this, new Response.ErrorListener() {
             @Override
