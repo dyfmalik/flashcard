@@ -23,6 +23,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amigold.fundapter.BindDictionary;
+import com.amigold.fundapter.FunDapter;
+import com.amigold.fundapter.extractors.StringExtractor;
+import com.amigold.fundapter.interfaces.DynamicImageLoader;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.kosalgeek.android.json.JsonConverter;
+import com.squareup.picasso.Picasso;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -47,18 +58,19 @@ import kr.co.bit.osf.flashcard.common.IntentExtrasName;
 import kr.co.bit.osf.flashcard.common.IntentRequestCode;
 import kr.co.bit.osf.flashcard.common.IntentReturnCode;
 import kr.co.bit.osf.flashcard.db.BoxDTO;
+import kr.co.bit.osf.flashcard.db.Card;
 import kr.co.bit.osf.flashcard.db.CardDTO;
 import kr.co.bit.osf.flashcard.db.FlashCardDB;
 import kr.co.bit.osf.flashcard.db.StateDTO;
 import kr.co.bit.osf.flashcard.debug.Dlog;
 
-public class BoxListActivity_ extends AppCompatActivity {
+public class BoxListActivity_ extends AppCompatActivity implements Response.Listener<String> {
     // db
     private FlashCardDB db = null;
     private List<BoxDTO> boxList = null;
     // grid view
-    private GridView gridView = null;
-    private BoxListAdapter adapter = null;
+    //private GridView gridView = null;
+    //private BoxListAdapter adapter = null;
     //dialog
     private DialogInterface dialogInterface = null;
 
@@ -66,20 +78,19 @@ public class BoxListActivity_ extends AppCompatActivity {
     ProgressDialog progressDialog;
     ArrayList<CardDTO> rest;
     String Error;
-    String cid="tai kucing";
+
     String total;
+    GridView gridView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_box_list);
+        setContentView(R.layout.activity_box_list_);
         Dlog.i("");
 
         //by me
-        String total_="bitch";
-        Log.d("URL", "" + total_);
-        new init().execute();
-        //getDataFromDb();
+        gridView=(GridView)findViewById(R.id.boxListGridView);
+
         // read state from db
         //commented by me
         db = new FlashCardDB(this);
@@ -110,14 +121,21 @@ public class BoxListActivity_ extends AppCompatActivity {
             helpImageView.setVisibility(View.GONE);
         }
 
+
+        //by me: editing gridview
+        getData();
+        ///by me
+
+
         // read box list
         boxList = db.getBoxAll();
         Dlog.i("getBoxAll:size():" + boxList.size());
 
+
         // list view
         gridView = (GridView) findViewById(R.id.boxListGridView);
-        adapter = new BoxListAdapter(this, boxList);
-        gridView.setAdapter(adapter);
+        /*adapter = new BoxListAdapter(this, boxList);
+        gridView.setAdapter(adapter);*/
 
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -179,7 +197,7 @@ public class BoxListActivity_ extends AppCompatActivity {
                                         String newBoxName = inputText.getText().toString();
                                         boxList.get(position).setName(newBoxName);
                                         db.updateBox(boxList.get(position));
-                                        adapter.notifyDataSetChanged();
+                                        //adapter.notifyDataSetChanged();
                                         Dlog.i("new box name:" + newBoxName);
                                     }
                                 });
@@ -215,7 +233,7 @@ public class BoxListActivity_ extends AppCompatActivity {
                                             db.deleteCardByBoxId(deleteBoxId);
                                             boxList.remove(position);
                                             Dlog.i("delete box id:" + deleteBoxId);
-                                            adapter.notifyDataSetChanged();
+                                            //adapter.notifyDataSetChanged();
                                         }
                                     }
                                 });
@@ -250,7 +268,7 @@ public class BoxListActivity_ extends AppCompatActivity {
         return true;
     }
 
-    @Override
+    /*@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item == null && boxList == null) {
             Dlog.i("item : " + item + " boxList : " + boxList.toString());
@@ -354,7 +372,7 @@ public class BoxListActivity_ extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -366,7 +384,36 @@ public class BoxListActivity_ extends AppCompatActivity {
         }
     }
 
-    public class BoxListAdapter extends BaseAdapter {
+    //by me
+    @Override
+    public void onResponse(String response) {
+        Log.d("gue", response);
+        ArrayList<Card> cardlist=new JsonConverter<Card>().toArrayList(response,Card.class);
+        BindDictionary<Card> dictionary=new BindDictionary<>();
+        dictionary.addStringField(R.id.boxListViewItemText, new StringExtractor<Card>() {
+            @Override
+            public String getStringValue(Card card, int i) {
+                return card.cback;
+            }
+        });
+        dictionary.addDynamicImageField(R.id.boxListViewItemImage, new StringExtractor<Card>() {
+            @Override
+            public String getStringValue(Card card, int i) {
+                return card.url;
+            }
+        }, new DynamicImageLoader() {
+            @Override
+            public void loadImage(String url, ImageView imageView) {
+                Picasso.with(getApplicationContext()).load("http://10.0.2.2/flashcard/" + url).into(imageView);
+                /*imageView.setPadding(0, 0, 0, 0);
+                imageView.setAdjustViewBounds(true);*/
+            }
+        });
+        FunDapter<Card> adapter=new FunDapter<>(getApplicationContext(),cardlist,R.layout.activity_box_list_item_, dictionary);
+        gridView.setAdapter(adapter);
+    }
+
+    /*public class BoxListAdapter extends BaseAdapter {
         private Context context;
         private List<BoxDTO> list;
 
@@ -425,8 +472,8 @@ public class BoxListActivity_ extends AppCompatActivity {
             return view;
         }
     }
-
-    @Override
+*/
+   /* @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Dlog.i("requestCode=" + requestCode + ",resultCode=" + resultCode);
         if (data == null) {
@@ -447,18 +494,12 @@ public class BoxListActivity_ extends AppCompatActivity {
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
+    }*/
 
-    /**
-     * ?? ????
-     *
-     * @author falbb
-     */
+
     static class NameAscCompare implements Comparator<BoxDTO> {
 
-        /**
-         * ????(ASC)
-         */
+
         @Override
         public int compare(BoxDTO arg0, BoxDTO arg1) {
             return arg0.getName().compareTo(arg1.getName());
@@ -466,32 +507,18 @@ public class BoxListActivity_ extends AppCompatActivity {
 
     }
 
-    /**
-     * ?? ????
-     *
-     * @author falbb
-     */
     static class NameDescCompare implements Comparator<BoxDTO> {
 
-        /**
-         * ????(DESC)
-         */
+
         @Override
         public int compare(BoxDTO arg0, BoxDTO arg1) {
             return arg1.getName().compareTo(arg0.getName());
         }
     }
 
-    /**
-     * No ????
-     *
-     * @author falbb
-     */
+
     static class NoAscCompare implements Comparator<BoxDTO> {
 
-        /**
-         * ????(ASC)
-         */
         @Override
         public int compare(BoxDTO arg0, BoxDTO arg1) {
             return arg0.getId() < arg1.getId() ? -1 : arg0.getId() > arg1.getId() ? 1 : 0;
@@ -499,104 +526,18 @@ public class BoxListActivity_ extends AppCompatActivity {
 
     }
 
-    public class init extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = new ProgressDialog(BoxListActivity_.this);
-            progressDialog.setMessage("Load for data");
 
-            progressDialog.setCancelable(true);
-            progressDialog.show();
-        }
+    //by me
+    private void getData(){
+        String url="http://10.0.2.2/flashcard/webservice/getCards.php";
 
-        @Override
-        protected Void doInBackground(Void... params) {
-            getDataFromDb();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            if (Error != null) {
-                if (progressDialog.isShowing()) {
-                    progressDialog.dismiss();
-                }
-                Toast.makeText(BoxListActivity_.this, "there is no data found", Toast.LENGTH_LONG).show();
-
+        StringRequest stringRequest=new StringRequest(Request.Method.GET, url, this, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),"Error while reading data",Toast.LENGTH_SHORT).show();
             }
-            else
-            {
-                if (progressDialog.isShowing()) {
-                    progressDialog.dismiss();
-                    try {
-                        Toast.makeText(BoxListActivity_.this, total, Toast.LENGTH_LONG).show();
-                    }
-                    catch (NullPointerException e){
-                    }
-
-                }
-            }
-
-        }
-
+        });
+        MySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
     }
 
-    private void getDataFromDb() {
-        //Toast.makeText(this,"cek",Toast.LENGTH_LONG).show();
-
-        URL hp = null;
-        try {
-            rest.clear();
-
-            hp = new URL("http://localhost/flashcard/webservice/getCards.php");
-            URLConnection hpCon = hp.openConnection();
-            hpCon.connect();
-            InputStream input = hpCon.getInputStream();
-            BufferedReader r = new BufferedReader(new InputStreamReader(input));
-
-
-            String x = "";
-            x = r.readLine();
-            total = "";
-
-            while (x != null) {
-                total += x;
-                x = r.readLine();
-            }
-            Log.d("URL", "" + total);
-            JSONObject j = new JSONObject(total);
-            Log.d("total", "" + j);
-            //Toast.makeText(this, total, Toast.LENGTH_LONG).show();
-
-            Log.d("jsonobject", "" + j);
-            /*for (int i = 0; i < j.length(); i++) {
-                JSONObject obj = j.getJSONObject("cards");
-                cid=obj.getString("cid");
-
-            }*/
-
-
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            Error = e.getMessage();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            Error = e.getMessage();
-        }
-            catch (JSONException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                Error = e.getMessage();
-
-        } catch (NullPointerException e) {
-            // TODO: handle exception
-            Error = e.getMessage();
-        }
-
-
-    }
 }
