@@ -81,7 +81,8 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
     ArrayList<CardDTO> rest;
     String Error;
     ArrayList<Kategori> kategoriList;
-
+    private static final int REQUEST_RESPONSE = 1;
+    public static final String ID_KAT = "id_kat";
     String total;
     GridView gridView;
 
@@ -144,18 +145,14 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Dlog.i("posisigue" + position);
-                if (!(db.updateState(boxList.get(position).getId(), 0))) {
-                    Dlog.i("state ?? ?? : " + db.updateState(boxList.get(position).getId(), 0));
-                }
-                Dlog.i("box:" + position);
-                Dlog.i("idgue:" + id);
-                //String position2=position;
                 Kategori kategori1=kategoriList.get(position);
-                String nama=kategori1.nama_kat;
                 int id_kat=kategori1.id_kat;
+                Intent intent = new Intent(getApplicationContext(), CardListActivity_.class);
+                //startActivity(intent);
+                intent.putExtra("id_kat", Integer.toString(id_kat));
+                startActivityForResult(intent, REQUEST_RESPONSE);
 
-                Toast.makeText(getApplicationContext(), Integer.toString(id_kat),Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), Integer.toString(id_kat),Toast.LENGTH_SHORT).show();
 
                 /*Intent intent = new Intent(getApplicationContext(), CardListActivity.class);
                 startActivityForResult(intent, IntentRequestCode.CARD_LIST_VIEW);*/

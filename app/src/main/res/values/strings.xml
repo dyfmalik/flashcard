@@ -5,6 +5,7 @@
     <string name="title_activity_card_list">Card Box</string>
     <string name="title_activity_card_view">Card View</string>
     <string name="title_activity_card_edit">Replace card</string>
+    <string name="title_activity_card_list_">Card List</string>
     <!--box demo data-->
     <string name="box_demo_data_name1">Animal</string>
     <string name="box_demo_data_name2">Number</string>

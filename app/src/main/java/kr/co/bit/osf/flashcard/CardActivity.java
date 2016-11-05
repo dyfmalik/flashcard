@@ -1,5 +1,6 @@
 package kr.co.bit.osf.flashcard;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -28,13 +29,19 @@ public class CardActivity extends AppCompatActivity implements Response.Listener
 
     final String TAG=this.getClass().getSimpleName();
     ListView lvCard;
+    //String data = getIntent().getStringExtra(BoxListActivity_.ID_KAT);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card);
         lvCard=(ListView)findViewById(R.id.listCardView);
-        Toast.makeText(this, "created", Toast.LENGTH_SHORT).show();
+        Intent intent2 = getIntent();
+        Bundle bundle = intent2.getExtras();
+        String id_kat = bundle.getString("id_kat");
+
+        Toast.makeText(this, id_kat, Toast.LENGTH_SHORT).show();
+
         getData();
     }
     public void getData(){
@@ -71,8 +78,8 @@ public class CardActivity extends AppCompatActivity implements Response.Listener
             @Override
             public void loadImage(String url, ImageView imageView) {
                 Picasso.with(getApplicationContext()).load("http://10.0.2.2/flashcard/" + url).into(imageView);
-                /*imageView.setPadding(0, 0, 0, 0);
-                imageView.setAdjustViewBounds(true);*/
+                //*imageView.setPadding(0, 0, 0, 0);
+                imageView.setAdjustViewBounds(true);
             }
         });
         FunDapter<Card> adapter=new FunDapter<>(getApplicationContext(),cardlist,R.layout.content_list, dictionary);

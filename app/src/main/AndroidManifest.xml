@@ -46,6 +46,10 @@
             android:name=".CardActivity"
             android:label="@string/title_activity_card" >
         </activity>
+        <activity
+            android:name=".CardListActivity_"
+            android:label="title_activity_card_list_" >
+        </activity>
 
     </application>
 
