@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -18,6 +19,7 @@ import java.util.Date;
 
 import kr.co.bit.osf.flashcard.R;
 import kr.co.bit.osf.flashcard.db.CardDTO;
+import kr.co.bit.osf.flashcard.db.Card;
 import kr.co.bit.osf.flashcard.db.FlashCardDB;
 import kr.co.bit.osf.flashcard.debug.Dlog;
 
@@ -88,7 +90,7 @@ public class ImageConfig {
         return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
     }
 
-    public static void loadCardImageIntoImageView(Context context, CardDTO card, ImageView imageView) {
+   public static void loadCardImageIntoImageView(Context context, CardDTO card, ImageView imageView) {
         Dlog.i(card.toString());
         int imageId = 0;
         try {
@@ -124,6 +126,9 @@ public class ImageConfig {
             Glide.with(context).fromResource().load(imageId).into(imageView);
         }
     }
+
+
+
 
     public static String getImagePathFromIntentData(Context context, Intent data) {
         Uri selectedImageUri = data.getData();

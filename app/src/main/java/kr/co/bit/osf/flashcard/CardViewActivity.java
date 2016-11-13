@@ -13,12 +13,27 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.amigold.fundapter.BindDictionary;
+import com.amigold.fundapter.FunDapter;
+import com.amigold.fundapter.extractors.StringExtractor;
+import com.amigold.fundapter.interfaces.DynamicImageLoader;
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.kosalgeek.android.json.JsonConverter;
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -28,16 +43,20 @@ import kr.co.bit.osf.flashcard.common.ImageConfig;
 import kr.co.bit.osf.flashcard.common.IntentExtrasName;
 import kr.co.bit.osf.flashcard.common.IntentRequestCode;
 import kr.co.bit.osf.flashcard.common.IntentReturnCode;
+import kr.co.bit.osf.flashcard.db.Card;
 import kr.co.bit.osf.flashcard.db.CardDTO;
 import kr.co.bit.osf.flashcard.db.FlashCardDB;
 import kr.co.bit.osf.flashcard.db.StateDTO;
 import kr.co.bit.osf.flashcard.debug.Dlog;
 
-public class CardViewActivity extends AppCompatActivity {
+public class CardViewActivity extends AppCompatActivity implements Response.Listener<String> {
     // db
     FlashCardDB db = null;
     StateDTO cardState = null;
     List<CardDTO> cardList = null;
+    //byme
+    ArrayList<Card>  cardList_=null;
+    //
 
     // tts -- urstory@gmail.com
     TextToSpeech tts;
@@ -57,49 +76,72 @@ public class CardViewActivity extends AppCompatActivity {
     // card updated
     boolean isCardUpdated = false;
 
+    //byme
+    String id_kat, cid;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_view);
 
+        //id_kat="1";
+        //get intent
+        Intent intent2 = getIntent();
+        Bundle bundle = intent2.getExtras();
+        cid = bundle.getString("cid");
+
+
+
         // tts
-        ttsLoad();
+        //ttsLoad();byme
 
         // full screen
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) actionBar.hide();
+        /*ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) actionBar.hide();*/
 
         // read state from db
-        db = new FlashCardDB(this);
+        /*db = new FlashCardDB(this);
         cardState = db.getState();
-        Dlog.i("read card state:" + cardState);
+        Dlog.i("read card state:" + cardState);byme*/
 
         // read card list by state
-        cardList = db.getCardByBoxId(cardState.getBoxId());
+        /*cardList = db.getCardByBoxId(cardState.getBoxId());
         Dlog.i("card list:size:" + cardList.size());
         if (cardList.size() == 0) {
             finish();
             return ;
         }
-        Dlog.i("card list:value:" + cardList);
+        Dlog.i("card list:value:" + cardList);byme*/
+
+        //byme get from database
+
+        getData();
+
 
         // show card list
         // view pager
         pager = (ViewPager) findViewById(R.id.cardViewPager);
         // set pager adapter
-        pagerAdapter = new CardViewPagerAdapter(this, cardList);
+        pagerAdapter = new CardViewPagerAdapter(this, cardList_);
         pager.setAdapter(pagerAdapter);
         pager.setOffscreenPageLimit(1);
 
         // set current position by state card id
-        int stateCardId = cardState.getCardId();
+        /*int stateCardId = cardState.getCardId();
         for (int i = 0; i < cardList.size(); i++) {
             if (stateCardId == cardList.get(i).getId()) {
                 currentPosition = i;
                 break;
             }
-        }
-        if (currentPosition < cardList.size()) {
+        }byme*/
+        //byme
+        /*for (int i = 0; i < cardList_.size(); i++) {
+            if (stateCardId == cardList_.get(i).cid) {
+                currentPosition = i;
+                break;
+            }
+        }*/
+        if (currentPosition < cardList_.size()) {
             pager.setCurrentItem(currentPosition);
             Dlog.i("setCurrentItem:currentPosition:" + currentPosition);
         }
@@ -137,7 +179,7 @@ public class CardViewActivity extends AppCompatActivity {
         });
     }
 
-    @Override
+    /*@Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         Dlog.i("");
@@ -155,13 +197,15 @@ public class CardViewActivity extends AppCompatActivity {
         }
     }
 
+
+*/
     // pager adapter
     private class CardViewPagerAdapter extends PagerAdapter {
         private Context context = null;
         private LayoutInflater inflater;
-        List<CardDTO> list = null;
+        ArrayList<Card> list = null;
 
-        public CardViewPagerAdapter(Context context, List<CardDTO> list) {
+        public CardViewPagerAdapter(Context context, ArrayList<Card> list) {
             super();
             this.context = context;
             this.list = list;
@@ -173,6 +217,7 @@ public class CardViewActivity extends AppCompatActivity {
         public int getCount() {
             if (list != null) {
                 return list.size();
+
             } else {
                 return 0;
             }
@@ -197,9 +242,12 @@ public class CardViewActivity extends AppCompatActivity {
             PagerHolder holder = new PagerHolder(list.get(position), position,
                     imageView, textView, flipAnimator);
             // image
-            ImageConfig.loadCardImageIntoImageView(CardViewActivity.this, holder.getCard(), imageView);
+            //ImageConfig.loadCardImageIntoImageView(CardViewActivity.this, holder.getCard(), imageView);byme
+            //Picasso.with(getApplicationContext()).load("http://10.0.2.2/flashcard/" + holder.getCard().url).into(imageView);
+            //byme load image
+
             // text
-            textView.setText(holder.getCard().getName());
+            textView.setText(holder.getCard().cfront);
 
             // set click event
             view.setOnClickListener(new View.OnClickListener() {
@@ -241,6 +289,7 @@ public class CardViewActivity extends AppCompatActivity {
             return POSITION_NONE;
         }
     }
+
 
     private void childViewClicked(View view) {
         // read holder
@@ -290,7 +339,7 @@ public class CardViewActivity extends AppCompatActivity {
         dialogEditTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialogEditTextViewClicked();
+                //dialogEditTextViewClicked();
                 // http://stackoverflow.com/questions/5713312/closing-a-custom-alert-dialog-on-button-click
                 ((AlertDialog) v.getTag()).cancel();
                 Dlog.i("dialog:edit card:clicked");
@@ -304,7 +353,7 @@ public class CardViewActivity extends AppCompatActivity {
         dialogDeleteTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialogDeleteTextViewClicked();
+                //dialogDeleteTextViewClicked();
                 // http://stackoverflow.com/questions/5713312/closing-a-custom-alert-dialog-on-button-click
                 ((AlertDialog) v.getTag()).cancel();
                 Dlog.i("dialog:delete card:clicked");
@@ -312,7 +361,7 @@ public class CardViewActivity extends AppCompatActivity {
         });
         dialog.show();
     }
-
+/*
     private void dialogEditTextViewClicked() {
         startEditAcitivity(IntentRequestCode.CARD_EDIT);
     }
@@ -429,15 +478,16 @@ public class CardViewActivity extends AppCompatActivity {
         super.finish();
     }
 
+*/
     // inner class for pager adapter item and flip animation
     private class PagerHolder {
-        private CardDTO card;
+        private Card card;
         private ImageView imageView;
         private TextView textView;
         private int cardIndex;
         ValueAnimator flipAnimator;
 
-        public PagerHolder(CardDTO card, int index,
+        public PagerHolder(Card card, int index,
                            ImageView imageView, TextView textView, ValueAnimator flipAnimator) {
             this.card = card;
             this.cardIndex = index;
@@ -445,6 +495,7 @@ public class CardViewActivity extends AppCompatActivity {
             this.textView = textView;
             this.flipAnimator = flipAnimator;
         }
+
 
         public ImageView getImageView() {
             return imageView;
@@ -470,9 +521,11 @@ public class CardViewActivity extends AppCompatActivity {
             return flipAnimator.getAnimatedFraction() == 1;
         }
 
-        public CardDTO getCard() {
+
+        public Card getCard() {
             return card;
         }
+
 
         public int getCardIndex() {
             return cardIndex;
@@ -529,6 +582,7 @@ public class CardViewActivity extends AppCompatActivity {
             this.mBackView.setVisibility(flipped ? View.VISIBLE : View.GONE);
         }
     }
+
 
     // tts
     @SuppressWarnings("deprecation")
@@ -591,4 +645,58 @@ public class CardViewActivity extends AppCompatActivity {
             Dlog.e(e.toString());
         }
     }
+
+
+
+
+    //byme
+    private void getData(){
+        String url="http://10.0.2.2/flashcard/webservice/getCardsBasedIDKategori.php";
+
+        StringRequest stringRequest=new StringRequest(Request.Method.POST, url, this, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),"Error while reading data",Toast.LENGTH_SHORT).show();
+            }
+        }){@Override
+        protected Map<String, String> getParams() throws AuthFailureError {
+            Map<String, String> params = new HashMap<>();
+            params.put("id_kat", id_kat);
+            return params;
+        }
+        };
+        MySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
+    }
+
+
+    @Override
+    public void onResponse(String response) {
+        Log.d("gue", response);
+        cardList_=new JsonConverter<Card>().toArrayList(response,Card.class);
+        String cfront=cardList_.get(1).cfront;
+        Toast.makeText(getApplicationContext(), cfront, Toast.LENGTH_LONG).show();
+       /* BindDictionary<Card> dictionary =new BindDictionary<>();
+        dictionary.addStringField(R.id.cardCustomListName_, new StringExtractor<Card>() {
+            @Override
+            public String getStringValue(Card card, int i) {
+                return card.cfront;
+            }
+        });
+        dictionary.addDynamicImageField(R.id.cardCustomListImage_, new StringExtractor<Card>() {
+            @Override
+            public String getStringValue(Card card, int i) {
+                return card.url;
+            }
+        }, new DynamicImageLoader() {
+            @Override
+            public void loadImage(String url, ImageView imageView) {
+                Picasso.with(getApplicationContext()).load("http://10.0.2.2/flashcard/" + url).into(imageView);
+                *//*imageView.setPadding(0, 0, 0, 0);
+                imageView.setAdjustViewBounds(true);*//*
+            }
+        });
+        FunDapter<Card> adapter=new FunDapter<>(getApplicationContext(),cardList_,R.layout.activity_card_list_item_, dictionary);*/
+        //gridView.setAdapter(adapter);
+    }
+
 }

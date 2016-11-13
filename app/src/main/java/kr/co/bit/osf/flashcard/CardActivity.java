@@ -29,8 +29,21 @@ public class CardActivity extends AppCompatActivity implements Response.Listener
 
     final String TAG=this.getClass().getSimpleName();
     ListView lvCard;
+    ArrayList<Card> cardlist;
     //String data = getIntent().getStringExtra(BoxListActivity_.ID_KAT);
+    ArrayList<Card> cardList2;
 
+
+    private void setCardList()
+    {
+        cardList2=new ArrayList<>();
+        Card card1 = new Card();
+        card1.cback="gajah";
+        card1.cfront="elephant";
+        cardList2.add(card1);
+
+
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,9 +53,11 @@ public class CardActivity extends AppCompatActivity implements Response.Listener
         Bundle bundle = intent2.getExtras();
         String id_kat = bundle.getString("id_kat");
 
-        Toast.makeText(this, id_kat, Toast.LENGTH_SHORT).show();
-
-        getData();
+        //Toast.makeText(this, id_kat, Toast.LENGTH_SHORT).show();
+        setCardList();
+        Toast.makeText(this, cardList2.get(1).cfront, Toast.LENGTH_SHORT).show();
+        //getData();
+        //setData();
     }
     public void getData(){
         String url="http://10.0.2.2/flashcard/webservice/getCards.php";
@@ -56,12 +71,8 @@ public class CardActivity extends AppCompatActivity implements Response.Listener
         MySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
 
     }
-
-
-    @Override
-    public void onResponse(String response) {
-        Log.d("gue", response);
-        ArrayList<Card> cardlist=new JsonConverter<Card>().toArrayList(response,Card.class);
+    public void setData() {
+        Toast.makeText(getApplication(), "setData", Toast.LENGTH_LONG).show();
         BindDictionary<Card> dictionary=new BindDictionary<>();
         dictionary.addStringField(R.id.tvText, new StringExtractor<Card>() {
             @Override
@@ -84,5 +95,17 @@ public class CardActivity extends AppCompatActivity implements Response.Listener
         });
         FunDapter<Card> adapter=new FunDapter<>(getApplicationContext(),cardlist,R.layout.content_list, dictionary);
         lvCard.setAdapter(adapter);
+    }
+
+
+
+
+    @Override
+    public void onResponse(String response) {
+        Log.d("gue", response);
+        cardlist=new JsonConverter<Card>().toArrayList(response,Card.class);
+        Toast.makeText(getApplication(), cardlist.get(1).cfront.toString(),Toast.LENGTH_SHORT).show();
+        //setData();
+
     }
 }

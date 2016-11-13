@@ -28,6 +28,7 @@ import com.amigold.fundapter.BindDictionary;
 import com.amigold.fundapter.FunDapter;
 import com.amigold.fundapter.extractors.StringExtractor;
 import com.amigold.fundapter.interfaces.DynamicImageLoader;
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -85,7 +86,7 @@ public class CardListActivity_ extends AppCompatActivity implements Response.Lis
     //byme
     ArrayList<Card> cardList_;
     GridView gridView;
-
+    String id_kat;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,7 +94,7 @@ public class CardListActivity_ extends AppCompatActivity implements Response.Lis
 
         Intent intent2 = getIntent();
         Bundle bundle = intent2.getExtras();
-        String id_kat = bundle.getString("id_kat");
+        id_kat = bundle.getString("id_kat");
 
         Toast.makeText(this, id_kat, Toast.LENGTH_SHORT).show();
 
@@ -147,12 +148,23 @@ public class CardListActivity_ extends AppCompatActivity implements Response.Lis
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // card view
-                int boxId = cardList.get(position).getBoxId();
+              /* int boxId = cardList.get(position).getBoxId();
                 int cardId = cardList.get(position).getId();
                 db.updateState(boxId, cardId);
+
                 Intent intent = new Intent(getApplicationContext(), CardViewActivity.class);
                 startActivityForResult(intent, IntentRequestCode.CARD_VIEW);
-                Dlog.i("startActivityForResult");
+                Dlog.i("startActivityForResult");*/
+
+
+                //byme
+                Card card1=cardList_.get(position);
+                int cid=card1.cid;
+                Toast.makeText(getApplicationContext(), Integer.toString(cid),Toast.LENGTH_SHORT).show();
+                Intent intent2 = new Intent(getApplicationContext(), CardViewActivity.class);
+                intent2.putExtra("cid", Integer.toString(cid));
+                startActivityForResult(intent2, 1);
+
             }
         });
 
@@ -178,6 +190,8 @@ public class CardListActivity_ extends AppCompatActivity implements Response.Lis
                     @Override
                     public void onClick(View v) {
                         if (cardList.size() >= sendCardListIndex) {
+                            Card kategori1=cardList_.get(position);
+                            //int id_kat=kategori1.id_kat;
                             CardDTO sendCard = cardList.get(sendCardListIndex);
                             if (sendCard != null) {
                                 Intent intent = new Intent(getApplicationContext(), CardEditActivity.class);
@@ -694,12 +708,18 @@ public class CardListActivity_ extends AppCompatActivity implements Response.Lis
     private void getData(){
         String url="http://10.0.2.2/flashcard/webservice/getCardsBasedIDKategori.php";
 
-        StringRequest stringRequest=new StringRequest(Request.Method.GET, url, this, new Response.ErrorListener() {
+        StringRequest stringRequest=new StringRequest(Request.Method.POST, url, this, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(getApplicationContext(),"Error while reading data",Toast.LENGTH_SHORT).show();
             }
-        });
+        }){@Override
+        protected Map<String, String> getParams() throws AuthFailureError {
+            Map<String, String> params = new HashMap<>();
+            params.put("id_kat", id_kat);
+            return params;
+        }
+        };
         MySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
     }
 

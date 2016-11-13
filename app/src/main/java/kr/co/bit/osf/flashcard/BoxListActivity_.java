@@ -148,6 +148,7 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
                 Kategori kategori1=kategoriList.get(position);
                 int id_kat=kategori1.id_kat;
                 Intent intent = new Intent(getApplicationContext(), CardListActivity_.class);
+                //Intent intent = new Intent(getApplicationContext(), CardActivity.class);
                 //startActivity(intent);
                 intent.putExtra("id_kat", Integer.toString(id_kat));
                 startActivityForResult(intent, REQUEST_RESPONSE);
