@@ -27,6 +27,7 @@ import com.amigold.fundapter.BindDictionary;
 import com.amigold.fundapter.FunDapter;
 import com.amigold.fundapter.extractors.StringExtractor;
 import com.amigold.fundapter.interfaces.DynamicImageLoader;
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -50,7 +51,9 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import kr.co.bit.osf.flashcard.common.ActivityId;
 import kr.co.bit.osf.flashcard.common.ImageConfig;
@@ -61,6 +64,7 @@ import kr.co.bit.osf.flashcard.db.BoxDTO;
 import kr.co.bit.osf.flashcard.db.Card;
 import kr.co.bit.osf.flashcard.db.CardDTO;
 import kr.co.bit.osf.flashcard.db.FlashCardDB;
+import kr.co.bit.osf.flashcard.db.FlashCardDB_;
 import kr.co.bit.osf.flashcard.db.Kategori;
 import kr.co.bit.osf.flashcard.db.StateDTO;
 import kr.co.bit.osf.flashcard.debug.Dlog;
@@ -68,23 +72,28 @@ import kr.co.bit.osf.flashcard.debug.Dlog;
 public class BoxListActivity_ extends AppCompatActivity implements Response.Listener<String> {
     // db
     private FlashCardDB db = null;
+    private FlashCardDB_ db_ = null;
     private List<BoxDTO> boxList = null;
-
+    //private List<Kategori> kategoriList=null;
     // grid view
     //private GridView gridView = null;
     //private BoxListAdapter adapter = null;
     //dialog
     private DialogInterface dialogInterface = null;
 
-    //by me
-    ProgressDialog progressDialog;
-    ArrayList<CardDTO> rest;
-    String Error;
+    //bm
+    //ProgressDialog progressDialog;
+    //ArrayList<CardDTO> rest;
+    //String Error;
     ArrayList<Kategori> kategoriList;
     private static final int REQUEST_RESPONSE = 1;
-    public static final String ID_KAT = "id_kat";
-    String total;
+    //public static final String ID_KAT = "id_kat";
+    //String total;
     GridView gridView;
+    String newBoxName;
+    String id_kat_position;
+    FunDapter<Kategori> adapter;
+    Kategori kategori;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,10 +103,12 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
 
         //by me
         gridView=(GridView)findViewById(R.id.boxListGridView);
+        kategori=new Kategori();
 
         // read state from db
         //commented by me
         db = new FlashCardDB(this);
+        db_=new FlashCardDB_(this);
         final StateDTO cardState = db.getState();
         Dlog.i("read card state:" + cardState);
 
@@ -126,19 +137,19 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
         }
 
 
-        //by me: editing gridview
+        //bm: editing gridview & setting kategori list
         getData();
-        ///by me
+        ///bm
 
 
         // read box list
-        boxList = db.getBoxAll();
-        Dlog.i("getBoxAll:size():" + boxList.size());
+        /*boxList = db.getBoxAll();
+        Dlog.i("getBoxAll:size():" + boxList.size()); bm*/
 
 
         // list view
         gridView = (GridView) findViewById(R.id.boxListGridView);
-        /*adapter = new BoxListAdapter(this, boxList);
+        /*adapter = new BoxListAdapter(this, kategoriList);
         gridView.setAdapter(adapter);*/
 
 
@@ -194,7 +205,8 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
                         textView.setVisibility(View.VISIBLE);
                         textView2.setVisibility(View.VISIBLE);
                         Dlog.i("dialog:edit box - set VISIBLE");
-                        inputText.setText(boxList.get(position).getName());
+                        //inputText.setText(boxList.get(position).getName());bm
+                        inputText.setText(kategoriList.get(position).nama_kat);
                         inputText.setSelection(inputText.length());
                         AlertDialog.Builder input = new AlertDialog.Builder(BoxListActivity_.this);
                         textView.setText(R.string.box_edit_dialog_edit_title);
@@ -206,11 +218,20 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
                                         // set new box name
-                                        String newBoxName = inputText.getText().toString();
-                                        boxList.get(position).setName(newBoxName);
-                                        db.updateBox(boxList.get(position));
+                                        newBoxName = inputText.getText().toString();
+                                        id_kat_position=Integer.toString(kategoriList.get(position).id_kat);
+                                        //boxList.get(position).setName(newBoxName);bm
+                                        //kategoriList.get(position).nama_kat=newBoxName;
+                                        db_.editKategori(kategoriList.get(position).id_kat, newBoxName );
+                                        //editKategori();
+                                        /*getData();*/
+                                        kategoriList.get(position).nama_kat=newBoxName;
+                                        //db.updateBox(boxList.get(position));
                                         //adapter.notifyDataSetChanged();
-                                        Dlog.i("new box name:" + newBoxName);
+                                        adapter.updateData(kategoriList);
+                                        Toast.makeText(getApplicationContext(),kategoriList.get(position).nama_kat, Toast.LENGTH_SHORT ).show();
+                                        //Dlog.i("new box name:" + newBoxName);
+
                                     }
                                 });
                         dialogInterface.dismiss();
@@ -239,14 +260,22 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int whichButton) {
                                         // delete box
-                                        int deleteBoxId = boxList.get(position).getId();
-                                        Dlog.i("delete box name:" + boxList.get(position).getName());
-                                        if (db.deleteBox(deleteBoxId)) {
+                                        int deleteBoxId = kategoriList.get(position).id_kat;
+                                        /*Dlog.i("delete box name:" + boxList.get(position).getName());*/
+                                       /* if (db.deleteBox(deleteBoxId)) {
                                             db.deleteCardByBoxId(deleteBoxId);
                                             boxList.remove(position);
                                             Dlog.i("delete box id:" + deleteBoxId);
-                                            //adapter.notifyDataSetChanged();
+                                            adapter.notifyDataSetChanged();
+                                        }*/
+                                        db_.hapusKategori(deleteBoxId);
+                                        if(db_.successDelete==1)
+                                        {
+                                            kategoriList.remove(position);
+                                            adapter.notifyDataSetChanged();
                                         }
+
+
                                     }
                                 });
                         delete.setNegativeButton(R.string.box_edit_dialog_delete_cancel_button_text,
@@ -280,10 +309,10 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
         return true;
     }
 
-    /*@Override
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item == null && boxList == null) {
-            Dlog.i("item : " + item + " boxList : " + boxList.toString());
+            Dlog.i("item : " + item + " boxList : " + kategoriList.toString());
             finish();
         }
         Integer id = item.getItemId();
@@ -312,11 +341,16 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
                                 // add box
                                 String addBoxName = inputText.getText().toString();
                                 Dlog.i("add box name:" + addBoxName);
-                                BoxDTO box = db.addBox(addBoxName);
+                                //BoxDTO box = db.addBox(addBoxName);
+                                //bm
+                                db_.tambahKategori(addBoxName);
+
+                                kategori.nama_kat = addBoxName;
+                                String box=kategori.nama_kat;
                                 if (box != null) {
                                     // refresh list
-                                    Dlog.i("refresh list:size():before:" + boxList.size());
-                                    boxList.add(box);
+                                    Dlog.i("refresh list:size():before:" + kategoriList.size());
+                                    //kategoriList.add(2, );
                                     Dlog.i("refresh list:size():after:" + boxList.size());
                                     gridView.setAdapter(adapter);
                                     adapter.notifyDataSetChanged();
@@ -384,7 +418,7 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
         }
 
         return super.onOptionsItemSelected(item);
-    }*/
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -417,22 +451,24 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
             @Override
             public void loadImage(String url, ImageView imageView) {
                 Picasso.with(getApplicationContext()).load("http://10.0.2.2/flashcard/" + url).into(imageView);
-                /*imageView.setPadding(0, 0, 0, 0);
-                imageView.setAdjustViewBounds(true);*/
+                /*imageView.setPadding(0, 0, 0, 0);*/
+                //imageView.setAdjustViewBounds(true);
             }
         });
-        FunDapter<Kategori> adapter=new FunDapter<>(getApplicationContext(),kategoriList,R.layout.activity_box_list_item_, dictionary);
+        adapter=new FunDapter<>(getApplicationContext(),kategoriList,R.layout.activity_box_list_item_, dictionary);
         gridView.setAdapter(adapter);
+
     }
 
     /*public class BoxListAdapter extends BaseAdapter {
         private Context context;
-        private List<BoxDTO> list;
+        //private List<BoxDTO> list;
+        private ArrayList<Kategori> list;
 
         public BoxListAdapter() {
         }
 
-        public BoxListAdapter(Context c, List<BoxDTO> list) {
+        public BoxListAdapter(Context c, ArrayList<Kategori> list) {
             context = c;
             this.list = list;
             Dlog.i("adapter:list:size():" + list.size());
@@ -461,12 +497,13 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View view = inflater.inflate(R.layout.activity_box_list_item, null);
+            View view = inflater.inflate(R.layout.activity_box_list_item_, null);
 
             Dlog.i("box position:" + position + ", box:" + list.get(position));
             // image
             ImageView imageView = (ImageView) view.findViewById(R.id.boxListViewItemImage);
-            CardDTO topCard = db.getTopCardByBoxId(list.get(position).getId());
+            //Card topCard = db.getTopCardByBoxId(list.get(position).id_kat);
+            getTopCardByBoxId(list.get(position).id_kat);
             if (topCard != null) {
                 Dlog.i("topCard:" + topCard);
                 ImageConfig.loadCardImageIntoImageView(BoxListActivity_.this, topCard, imageView);
@@ -483,8 +520,8 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
 
             return view;
         }
-    }
-*/
+    }*/
+
    /* @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Dlog.i("requestCode=" + requestCode + ",resultCode=" + resultCode);
@@ -541,15 +578,36 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
 
     //by me
     private void getData(){
+
         String url="http://10.0.2.2/flashcard/webservice/getAllKategori.php";
 
         StringRequest stringRequest=new StringRequest(Request.Method.GET, url, this, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(),"Error while reading data",Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(),"Error while reading data",Toast.LENGTH_SHORT).show();
+                if(error instanceof com.android.volley.TimeoutError){
+                    Toast.makeText(getApplicationContext(), "Time Out Error", Toast.LENGTH_SHORT).show();
+                }
+                else if(error instanceof com.android.volley.NoConnectionError){
+                    Toast.makeText(getApplicationContext(), "No Connection Error", Toast.LENGTH_SHORT).show();
+                }
+                else if(error instanceof com.android.volley.AuthFailureError){
+                    Toast.makeText(getApplicationContext(), "Authentication Failure Error", Toast.LENGTH_SHORT).show();
+                }
+                else if(error instanceof com.android.volley.NetworkError){
+                    Toast.makeText(getApplicationContext(), "Network Error", Toast.LENGTH_SHORT).show();
+                }
+                else if(error instanceof com.android.volley.ServerError){
+                    Toast.makeText(getApplicationContext(), "Server Error", Toast.LENGTH_SHORT).show();
+                }
+                else if(error instanceof com.android.volley.ParseError){
+                    Toast.makeText(getApplicationContext(), "JSON Parse Error", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         MySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
     }
+
+
 
 }

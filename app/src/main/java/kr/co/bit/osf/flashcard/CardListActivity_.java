@@ -162,7 +162,7 @@ public class CardListActivity_ extends AppCompatActivity implements Response.Lis
                 int cid=card1.cid;
                 Toast.makeText(getApplicationContext(), Integer.toString(cid),Toast.LENGTH_SHORT).show();
                 Intent intent2 = new Intent(getApplicationContext(), CardViewActivity.class);
-                intent2.putExtra("cid", Integer.toString(cid));
+                intent2.putExtra("id_kat", id_kat);
                 startActivityForResult(intent2, 1);
 
             }

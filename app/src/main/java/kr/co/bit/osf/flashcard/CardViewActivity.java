@@ -88,7 +88,8 @@ public class CardViewActivity extends AppCompatActivity implements Response.List
         //get intent
         Intent intent2 = getIntent();
         Bundle bundle = intent2.getExtras();
-        cid = bundle.getString("cid");
+        id_kat = bundle.getString("id_kat");
+
 
 
 
@@ -116,7 +117,7 @@ public class CardViewActivity extends AppCompatActivity implements Response.List
         //byme get from database
 
         getData();
-
+        //Toast.makeText(this, cid, Toast.LENGTH_SHORT).show();
 
         // show card list
         // view pager
@@ -133,7 +134,7 @@ public class CardViewActivity extends AppCompatActivity implements Response.List
                 currentPosition = i;
                 break;
             }
-        }byme*/
+        }*/
         //byme
         /*for (int i = 0; i < cardList_.size(); i++) {
             if (stateCardId == cardList_.get(i).cid) {
@@ -141,7 +142,7 @@ public class CardViewActivity extends AppCompatActivity implements Response.List
                 break;
             }
         }*/
-        if (currentPosition < cardList_.size()) {
+        /*if (currentPosition < cardList_.size()) {
             pager.setCurrentItem(currentPosition);
             Dlog.i("setCurrentItem:currentPosition:" + currentPosition);
         }
@@ -176,7 +177,7 @@ public class CardViewActivity extends AppCompatActivity implements Response.List
                     lastPosition = pager.getCurrentItem();
                 }
             }
-        });
+        });*/
     }
 
     /*@Override
@@ -209,8 +210,10 @@ public class CardViewActivity extends AppCompatActivity implements Response.List
             super();
             this.context = context;
             this.list = list;
-            inflater = LayoutInflater.from(context);
+            //inflater = LayoutInflater.from(context);//kbm
+            inflater=(LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);//bm
             Dlog.i("list:size():" + list.size());
+            Toast.makeText(getApplicationContext(), list.get(1).cback, Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -233,22 +236,22 @@ public class CardViewActivity extends AppCompatActivity implements Response.List
             Dlog.i("position:" + position);
 
             View view = inflater.inflate(R.layout.activity_card_view_pager_item, null);
-            ImageView imageView = (ImageView) view.findViewById(R.id.cardViewPagerItemImage);
+            //ImageView imageView = (ImageView) view.findViewById(R.id.cardViewPagerItemImage);
             TextView textView = (TextView) view.findViewById(R.id.cardViewPagerItemText);
 
-            ValueAnimator flipAnimator = ValueAnimator.ofFloat(0f, 1f);
-            flipAnimator.addUpdateListener(new FlipListener(imageView, textView));
+            //ValueAnimator flipAnimator = ValueAnimator.ofFloat(0f, 1f);
+            //flipAnimator.addUpdateListener(new FlipListener(imageView, textView));
 
-            PagerHolder holder = new PagerHolder(list.get(position), position,
-                    imageView, textView, flipAnimator);
+            /*PagerHolder holder = new PagerHolder(list.get(position), position,
+                    imageView, textView, flipAnimator);*/
             // image
             //ImageConfig.loadCardImageIntoImageView(CardViewActivity.this, holder.getCard(), imageView);byme
             //Picasso.with(getApplicationContext()).load("http://10.0.2.2/flashcard/" + holder.getCard().url).into(imageView);
             //byme load image
 
             // text
-            textView.setText(holder.getCard().cfront);
-
+            //textView.setText(holder.getCard().cfront);
+            textView.setText(list.get(position).cfront);
             // set click event
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -267,11 +270,12 @@ public class CardViewActivity extends AppCompatActivity implements Response.List
             });
 
             // write holder
-            view.setTag(holder);
+            //view.setTag(holder);
+            view.setTag(list.get(position));
             container.addView(view);
 
             // view pager item map
-            itemViewMap.put(position, view);
+            //itemViewMap.put(position, view);
 
             return view;
         }
@@ -301,9 +305,9 @@ public class CardViewActivity extends AppCompatActivity implements Response.List
                 String word = holder.getTextView().getText().toString();
                 // http://stackoverflow.com/a/29777304
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    ttsGreater21(word);
+                    //ttsGreater21(word);bm
                 } else {
-                    ttsUnder20(word);
+                    //ttsUnder20(word);bm
                 }
                 Dlog.i("tts:" + word);
             } catch (Exception e) {
@@ -586,7 +590,7 @@ public class CardViewActivity extends AppCompatActivity implements Response.List
 
     // tts
     @SuppressWarnings("deprecation")
-    private void ttsUnder20(String text) {
+  /*  private void ttsUnder20(String text) {
         HashMap<String, String> map = new HashMap<>();
         map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "MessageId");
         tts.speak(text, TextToSpeech.QUEUE_FLUSH, map);
@@ -598,8 +602,8 @@ public class CardViewActivity extends AppCompatActivity implements Response.List
         String utteranceId=this.hashCode() + "";
         tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId);
     }
-
-    // tts
+*/
+    /*// tts
     public void onPause() {
         super.onPause();
         ttsUnload();
@@ -615,9 +619,9 @@ public class CardViewActivity extends AppCompatActivity implements Response.List
     protected void onDestroy() {
         super.onDestroy();
         ttsUnload();
-    }
+    }*/
 
-    private void ttsLoad() {
+    /*private void ttsLoad() {
         try {
             if (tts == null) {
                 tts = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
@@ -644,7 +648,7 @@ public class CardViewActivity extends AppCompatActivity implements Response.List
         } catch (Exception e) {
             Dlog.e(e.toString());
         }
-    }
+    }*/
 
 
 
@@ -674,7 +678,7 @@ public class CardViewActivity extends AppCompatActivity implements Response.List
         Log.d("gue", response);
         cardList_=new JsonConverter<Card>().toArrayList(response,Card.class);
         String cfront=cardList_.get(1).cfront;
-        Toast.makeText(getApplicationContext(), cfront, Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), cfront, Toast.LENGTH_LONG).show();
        /* BindDictionary<Card> dictionary =new BindDictionary<>();
         dictionary.addStringField(R.id.cardCustomListName_, new StringExtractor<Card>() {
             @Override
