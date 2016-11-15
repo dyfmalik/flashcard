@@ -139,6 +139,9 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
 
         //bm: editing gridview & setting kategori list
         getData();
+        //gridView=db_.getData(gridView);
+
+        gridView.setAdapter(adapter);
         ///bm
 
 
@@ -148,7 +151,7 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
 
 
         // list view
-        gridView = (GridView) findViewById(R.id.boxListGridView);
+
         /*adapter = new BoxListAdapter(this, kategoriList);
         gridView.setAdapter(adapter);*/
 
@@ -269,8 +272,10 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
                                             adapter.notifyDataSetChanged();
                                         }*/
                                         db_.hapusKategori(deleteBoxId);
+
                                         if(db_.successDelete==1)
                                         {
+
                                             kategoriList.remove(position);
                                             adapter.notifyDataSetChanged();
                                         }
@@ -347,18 +352,20 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
 
                                 kategori.nama_kat = addBoxName;
                                 String box=kategori.nama_kat;
-                                if (box != null) {
+                                getData();
+                                getData();
+                                /*if (box != null) {
                                     // refresh list
                                     Dlog.i("refresh list:size():before:" + kategoriList.size());
                                     //kategoriList.add(2, );
-                                    Dlog.i("refresh list:size():after:" + boxList.size());
+                                    Dlog.i("refresh list:size():after:" + kategoriList.size());
                                     gridView.setAdapter(adapter);
                                     adapter.notifyDataSetChanged();
                                     // move last position
                                     if (adapter.getCount() > 0) {
                                         gridView.smoothScrollToPosition(adapter.getCount() - 1);
                                     }
-                                }
+                                }*/
                             }
                         });
                 input.setNegativeButton(R.string.box_edit_dialog_add_cancel_button_text,
