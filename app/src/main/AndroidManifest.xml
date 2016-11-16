@@ -48,8 +48,13 @@
         </activity>
         <activity
             android:name=".CardListActivity_"
-            android:label="title_activity_card_list_" >
+            android:label="CardList" >
         </activity>
+        <activity
+            android:name=".CardManageActivity"
+            android:label="Manage Kartu" >
+        </activity>
+
 
     </application>
 

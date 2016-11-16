@@ -26,7 +26,7 @@ import kr.co.bit.osf.flashcard.db.CardDTO;
 import kr.co.bit.osf.flashcard.db.FlashCardDB;
 import kr.co.bit.osf.flashcard.debug.Dlog;
 
-public class CardEditActivity extends AppCompatActivity {
+public class CardManageActivity extends AppCompatActivity {
     // dto
     private CardDTO card = null;
     // intent
@@ -43,7 +43,8 @@ public class CardEditActivity extends AppCompatActivity {
     List<CardDTO> cardList = null;
     // activity state
     private String activityStateDataName = "activityStateDataName";
-    private ActivityState currentState;
+    //private ActivityState currentState;bm
+    private static final int REQUEST_RESPONSE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,12 +53,17 @@ public class CardEditActivity extends AppCompatActivity {
 
         //Dlog.i("started");
 
+        //bm
+        /*Intent intent2 = getIntent();
+        Bundle bundle = intent2.getExtras();
+        String data = bundle.getString("data");*/
+
         // full screen
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) actionBar.hide();
+//        ActionBar actionBar = getSupportActionBar();
+//        if (actionBar != null) actionBar.hide();
 
         // get intent data
-        Intent intent = getIntent();
+        /*Intent intent = getIntent();
         intentRequestCode = intent.getIntExtra(IntentExtrasName.REQUEST_CODE, 0);
         Dlog.i("intentRequestCode:" + intentRequestCode);
         switch (intentRequestCode) {
@@ -86,15 +92,15 @@ public class CardEditActivity extends AppCompatActivity {
                     return;
                 }
                 break;
-        }
+        }*/
 
-        // process requested task
+        /*// process requested task
         Dlog.i("getExtras:sendData:" + card);
         intentResultCode = RESULT_OK;
         if (intentRequestCode == IntentRequestCode.CARD_DELETE) {
             Dlog.i("delete data:" + card);
             // delete card
-            FlashCardDB db = new FlashCardDB(CardEditActivity.this);
+            FlashCardDB db = new FlashCardDB(CardManageActivity.this);
             if (db.deleteCard(card.getId()) == false) {
                 intentResultCode = RESULT_CANCELED;
                 Dlog.i("delete error:" + card);
@@ -107,7 +113,7 @@ public class CardEditActivity extends AppCompatActivity {
             Dlog.i("delete data:" + cardList);
             //delete cardList
             if (cardList.size() > 0) {
-                FlashCardDB db = new FlashCardDB(CardEditActivity.this);
+                FlashCardDB db = new FlashCardDB(CardManageActivity.this);
                 Dlog.i("delete data:size():" + cardList.size());
                 if (db.deleteCard(cardList) == false) {
                     intentResultCode = RESULT_CANCELED;
@@ -183,18 +189,18 @@ public class CardEditActivity extends AppCompatActivity {
                 intentResultCode = RESULT_CANCELED;
                 finish();
             }
-        });
+        });*/
     }
 
-    private void imageClicked() {
+    /*private void imageClicked() {
         Dlog.i("CardEditActivity: imageClicked");
-        View dlg = CardEditActivity.this.getLayoutInflater().inflate(R.layout.edit_dialog_title, null);
+        View dlg = CardManageActivity.this.getLayoutInflater().inflate(R.layout.edit_dialog_title, null);
         // get user action from dialog
         final CharSequence[] items = {
                 getString(R.string.card_edit_image_dialog_camera_button_text),
                 getString(R.string.card_edit_image_dialog_gallery_button_text),
         };
-        AlertDialog.Builder builder = new AlertDialog.Builder(CardEditActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(CardManageActivity.this);
         TextView editTitle = (TextView)dlg.findViewById(R.id.dialogTitleTextView);
         editTitle.setText(R.string.card_edit_image_dialog_title);
         editTitle.setVisibility(View.VISIBLE);
@@ -229,8 +235,8 @@ public class CardEditActivity extends AppCompatActivity {
                 Dlog.i("cardEdit:galleryButton clicked");
                 // select card in gallery
                 Intent intent = new Intent(Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                intent.setType("image/*");
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.setType("image*//*");
                 startActivityForResult(
                         Intent.createChooser(intent, "Select Picture"),
                         IntentRequestCode.SELECT_PICTURE);
@@ -246,9 +252,9 @@ public class CardEditActivity extends AppCompatActivity {
 
         Dlog.i("CardEditActivity: textClicked");
 
-        AlertDialog.Builder alert = new AlertDialog.Builder(CardEditActivity.this);
+        AlertDialog.Builder alert = new AlertDialog.Builder(CardManageActivity.this);
         Dlog.i("CardEditActivity: textClicked:AlertDialog.Builder");
-        View dlg = CardEditActivity.this.getLayoutInflater().inflate(R.layout.edit_dialog_title, null);
+        View dlg = CardManageActivity.this.getLayoutInflater().inflate(R.layout.edit_dialog_title, null);
 
         TextView editTitle = (TextView)dlg.findViewById(R.id.dialogTitleTextView);
         editTitle.setText(R.string.card_edit_text_dialog_title);
@@ -455,15 +461,15 @@ public class CardEditActivity extends AppCompatActivity {
             return 0;
         }
 
-        public final Creator<ActivityState> CREATOR = new Creator<ActivityState>() {
+        public final Creator<ActivityState> CREATOR = new Creator<CardManageActivity.ActivityState>() {
             @Override
-            public ActivityState createFromParcel(Parcel in) {
-                return new ActivityState(in);
+            public CardManageActivity.ActivityState createFromParcel(Parcel in) {
+                return new CardManageActivity.ActivityState(in);
             }
 
             @Override
-            public ActivityState[] newArray(int size) {
-                return new ActivityState[size];
+            public CardManageActivity.ActivityState[] newArray(int size) {
+                return new CardManageActivity.ActivityState[size];
             }
         };
 
@@ -531,5 +537,5 @@ public class CardEditActivity extends AppCompatActivity {
                     ", card=" + card +
                     '}';
         }
-    }
+    }*/
 }

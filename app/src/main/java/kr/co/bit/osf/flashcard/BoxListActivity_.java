@@ -161,10 +161,12 @@ public class BoxListActivity_ extends AppCompatActivity implements Response.List
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Kategori kategori1=kategoriList.get(position);
                 int id_kat=kategori1.id_kat;
+                String nama_kat=kategori1.nama_kat;
                 Intent intent = new Intent(getApplicationContext(), CardListActivity_.class);
                 //Intent intent = new Intent(getApplicationContext(), CardActivity.class);
                 //startActivity(intent);
                 intent.putExtra("id_kat", Integer.toString(id_kat));
+                intent.putExtra("nama_kat", nama_kat);
                 startActivityForResult(intent, REQUEST_RESPONSE);
 
                 //Toast.makeText(getApplicationContext(), Integer.toString(id_kat),Toast.LENGTH_SHORT).show();

@@ -86,7 +86,8 @@ public class CardListActivity_ extends AppCompatActivity implements Response.Lis
     //byme
     ArrayList<Card> cardList_;
     GridView gridView;
-    String id_kat;
+    String id_kat, nama_kat;
+    private static final int REQUEST_RESPONSE = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,8 +96,12 @@ public class CardListActivity_ extends AppCompatActivity implements Response.Lis
         Intent intent2 = getIntent();
         Bundle bundle = intent2.getExtras();
         id_kat = bundle.getString("id_kat");
+        nama_kat = bundle.getString("nama_kat");
 
-        Toast.makeText(this, id_kat, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, id_kat, Toast.LENGTH_SHORT).show();
+
+        gridView = (GridView) findViewById(R.id.cardCustomGridView_);
+        getData();
 
         // db
         /*db = new FlashCardDB(this);
@@ -126,18 +131,19 @@ public class CardListActivity_ extends AppCompatActivity implements Response.Lis
 
         // box name
         try {
-            setTitle("Animal");
+            setTitle(nama_kat);
+            //Toast.makeText(getApplicationContext(), cardList_.get(Integer.parseInt(id_kat)).description, Toast.LENGTH_SHORT).show();
+            //setTitle("Animal");
         } catch (Exception e) {
             Dlog.e(e.toString());
         }
 
         // read card list
 //        cardList = db.getCardByBoxId(state.getBoxId());
-//        deleteCardIdMap = new HashMap<>();byme
+//        deleteCardIdMap = new HashMap<>();bm
 
-        //get data from database byme
-        gridView = (GridView) findViewById(R.id.cardCustomGridView_);
-        getData();
+        //get data from database bm
+
 
         // grid view
 
@@ -265,7 +271,7 @@ public class CardListActivity_ extends AppCompatActivity implements Response.Lis
         });
     }
 
-    /*@Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_card_list_menu, menu);
         menuItemAddCard = menu.findItem(R.id.card_list_menu_add);
@@ -275,36 +281,40 @@ public class CardListActivity_ extends AppCompatActivity implements Response.Lis
 
         // restore instance state
         if (deleteMenuClicked) {
-            setupDeleteMenuClicked(true);
+            //setupDeleteMenuClicked(true);
         }
 
         return true;
-    }*/
+    }
 
-   /* @Override
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
         switch (id) {
             case R.id.card_list_menu_add:
-                CardDTO cardToAdd = new CardDTO();
-                cardToAdd.setBoxId(state.getBoxId());
+                /*CardDTO cardToAdd = new CardDTO();
+                cardToAdd.setBoxId(state.getBoxId());*/
 
-                Intent intent = new Intent(getApplicationContext(), CardEditActivity.class);
-                intent.putExtra(IntentExtrasName.REQUEST_CODE, IntentRequestCode.CARD_ADD);
-                intent.putExtra(IntentExtrasName.SEND_DATA, cardToAdd);
-                startActivityForResult(intent, IntentRequestCode.CARD_ADD);
-                Dlog.i("ADD:startActivityForResult");
-                return true;
+                Intent intent = new Intent(getApplicationContext(), CardManageActivity.class);
+                /*intent.putExtra(IntentExtrasName.REQUEST_CODE, IntentRequestCode.CARD_ADD);
+                intent.putExtra(IntentExtrasName.SEND_DATA, cardToAdd);*/
+                startActivity(intent);
+                /*intent.putExtra("data", "data");
+
+                startActivityForResult(intent, REQUEST_RESPONSE);
+                Dlog.i("ADD:startActivityForResult");*/
+                //return true;
+                break;
             case R.id.card_list_menu_delete:
-                setupDeleteMenuClicked();
+                //setupDeleteMenuClicked();
                 return true;
             case R.id.card_list_menu_delete_confirm:
-                runMenuDeleteConfirm();
+                //runMenuDeleteConfirm();
                 break;
             case R.id.card_list_menu_delete_cancel:
                 deleteCardIdMap.clear();
-                runMenuDeleteConfirm();
+                //runMenuDeleteConfirm();
                 break;
             case R.id.card_list_menu_sort_shuffle:
                 Collections.shuffle(cardList);
@@ -312,24 +322,24 @@ public class CardListActivity_ extends AppCompatActivity implements Response.Lis
                 //refreshCardList();byme
                 break;
             case R.id.card_list_menu_sort_asc:
-                Collections.sort(cardList, new NameAscCompare());
+                //Collections.sort(cardList, new NameAscCompare());
                 db.updateCardSeq(cardList);
                 //refreshCardList();byme
                 break;
             case R.id.card_list_menu_sort_desc:
-                Collections.sort(cardList, new NameDescCompare());
+                //Collections.sort(cardList, new NameDescCompare());
                 db.updateCardSeq(cardList);
                 //refreshCardList();byme
                 break;
             case R.id.card_list_menu_sort_reset:
-                Collections.sort(cardList, new NoAscCompare());
+                //Collections.sort(cardList, new NoAscCompare());
                 db.updateCardSeq(cardList);
                 //refreshCardList();byme
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
-
+/*
     private void runMenuDeleteConfirm() {
         Dlog.i("delete confirm button");
         setupDeleteMenuClicked(false);
