@@ -85,4 +85,9 @@
     <string name="memo_btn3_text">3 Hard</string>
     <string name="memo_btn4_text">4 Easy</string>
     <string name="memo_btn5_text">5 Very Easy</string>
+
+    <string name="action_info">Photo info</string>
+    <string name="action_photo">View photo</string>
+
+    <string name="card_back_description"><![CDATA[Lorem ipsum dolor sit]]></string>
 </resources>

@@ -38,17 +38,18 @@
                 android:layout_gravity="bottom|right"
                 android:padding="10dp"
                 android:src="@drawable/default_image_camera"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Flip"
+                android:id="@+id/buttonSave"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:onClick="save" />
         </FrameLayout>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="New Button"
-            android:id="@+id/buttonSave"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:onClick="save" />
+
 
     </RelativeLayout>
 

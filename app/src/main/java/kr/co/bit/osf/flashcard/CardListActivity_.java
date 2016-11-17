@@ -297,15 +297,15 @@ public class CardListActivity_ extends AppCompatActivity implements Response.Lis
                 cardToAdd.setBoxId(state.getBoxId());*/
 
                 Intent intent = new Intent(getApplicationContext(), CardManageActivity.class);
-                /*intent.putExtra(IntentExtrasName.REQUEST_CODE, IntentRequestCode.CARD_ADD);
-                intent.putExtra(IntentExtrasName.SEND_DATA, cardToAdd);*/
-                startActivity(intent);
-                /*intent.putExtra("data", "data");
+                //intent.putExtra(IntentExtrasName.REQUEST_CODE, IntentRequestCode.CARD_ADD);
+                //intent.putExtra(IntentExtrasName.SEND_DATA, cardToAdd);
+                //startActivity(intent);
+                intent.putExtra("data", "tambahdata");
 
                 startActivityForResult(intent, REQUEST_RESPONSE);
-                Dlog.i("ADD:startActivityForResult");*/
-                //return true;
-                break;
+                //Dlog.i("ADD:startActivityForResult");
+                return true;
+                //break;
             case R.id.card_list_menu_delete:
                 //setupDeleteMenuClicked();
                 return true;
