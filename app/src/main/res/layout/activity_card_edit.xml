@@ -5,7 +5,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="kr.co.bit.osf.flashcard.CardEditActivity">
-
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Flip"
+        android:id="@+id/buttonSave"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="save" />
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,18 +27,21 @@
         android:paddingRight="30dp"
         android:background="#FFDDDDDD">
 
+
+
+        <!--<include layout="@layout/fragment_card_front"/>-->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/frameLayout"
             android:background="#FFF">
-            <ImageView
+            <!--<ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/cardEditImageView"
                 android:padding="15dp"
                 android:layout_gravity="center_vertical|center_horizontal"
-                android:src="@drawable/default_image_empty_image"/>
+                android:src="@drawable/default_image_empty_image"/>-->
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -38,15 +49,7 @@
                 android:layout_gravity="bottom|right"
                 android:padding="10dp"
                 android:src="@drawable/default_image_camera"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Flip"
-                android:id="@+id/buttonSave"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true"
-                android:onClick="save" />
+
         </FrameLayout>
 
 

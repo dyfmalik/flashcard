@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -104,6 +105,24 @@ public class CardManageActivity extends Activity implements FragmentManager.OnBa
                 flipCard();
             }
         });
+
+
+        //bm
+
+        LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View vi = inflater.inflate(R.layout.fragment_card_front, null);
+        ImageView img = (ImageView) vi.findViewById(R.id.cardEditImageView);
+        TextView tv= (TextView) vi.findViewById(R.id.textView1);
+        tv.setText("bitch");
+        img.setImageResource(R.drawable.z_demo_alphabet_a);
+        img.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "image clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
 
         // full screen
         /*ActionBar actionBar = getSupportActionBar();
@@ -624,9 +643,9 @@ public class CardManageActivity extends Activity implements FragmentManager.OnBa
                 // rotations when switching to the back of the card, as well as animator
                 // resources representing rotations when flipping back to the front (e.g. when
                 // the system Back button is pressed).
-                /*.setCustomAnimations(
+                .setCustomAnimations(
                         R.animator.card_flip_right_in, R.animator.card_flip_right_out,
-                        R.animator.card_flip_left_in, R.animator.card_flip_left_out)*/
+                        R.animator.card_flip_left_in, R.animator.card_flip_left_out)
 
 
                 // Replace any fragments currently in the container view with a fragment
@@ -657,9 +676,16 @@ public class CardManageActivity extends Activity implements FragmentManager.OnBa
         public CardFrontFragment() {
         }
 
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+            /*View vi = inflater.inflate(R.layout.fragment_card_front, container, false);
+            //ImageView img = (ImageView) vi.findViewById(R.id.cardEditImageView);
+            //img.setImageResource(R.drawable.z_demo_alphabet_a);
+            TextView tv= (TextView) vi.findViewById(R.id.textView1);
+            tv.setText("nit");
+            //Toast.makeText(getContext(), "click", Toast.LENGTH_SHORT).show();*/
             return inflater.inflate(R.layout.fragment_card_front, container, false);
         }
     }
@@ -674,7 +700,16 @@ public class CardManageActivity extends Activity implements FragmentManager.OnBa
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+
+            //LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            /*View vi = inflater.inflate(R.layout.fragment_card_front, null);
+            ImageView img = (ImageView) vi.findViewById(R.id.cardEditImageView);
+            TextView tv= (TextView) vi.findViewById(R.id.textView1);
+            tv.setText("bitch");
+            vi.setTag(tv);
+*/
             return inflater.inflate(R.layout.fragment_card_back, container, false);
+            //return vi;
         }
     }
 

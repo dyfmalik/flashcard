@@ -14,10 +14,71 @@
   limitations under the License.
   -->
 
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+<FrameLayout
+
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/frameLayout1"
+    android:background="#FFF"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/cardEditImageView"
+        android:padding="15dp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:src="@drawable/default_image_empty_image"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:padding="10dp"
+        android:src="@drawable/default_image_camera"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Flip"
+        android:id="@+id/buttonSave"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="save" />
+</FrameLayout>
+-->
+
+
+<!--<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:src="@drawable/z_demo_alphabet_a"
 
     android:layout_gravity="center_vertical|center_horizontal"
-    android:contentDescription="wkwkwkw" />
+    android:contentDescription="wkwkwkw" />-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/frameLayout"
+    android:background="#FFF">
+
+<ImageView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/cardEditImageView"
+    android:padding="15dp"
+    android:layout_gravity="center_vertical|center_horizontal"
+    android:src="@drawable/default_image_empty_image"/>
+
+
+<TextView
+android:id="@+id/textView1"
+android:layout_width="53dp"
+android:layout_height="wrap_content"
+android:layout_gravity="bottom"
+android:singleLine="true"
+android:text="TEXT"
+android:textSize="15dp"
+
+    ></TextView>
+    </FrameLayout>
